@@ -1,6 +1,5 @@
 import express from 'express';
 import path from 'path';
-//aqui nosotros tenemos que agregar las rutas que se van a consumir
 import productroutes from './routes/productroutes.js';
 
 
@@ -16,7 +15,6 @@ app.use(express.static(path.join(__dirname,  '../Frontend', 'public')));
 app.set('views engine', 'ejs');
 app.set('public', path.join(__dirname, '../Frontend', 'public'));
 
-//vamos a consumir las rutas
 app.use('/', productroutes);
 
 app.listen(PORT, () => {
