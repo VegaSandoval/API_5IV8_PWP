@@ -1,22 +1,25 @@
-import express from 'express';
-import path from 'path';
-import productroutes from './routes/productroutes.js';
-
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const path = require("path");
 
 const app = express();
-const PORT = process.env.PORT || 3000;  
 
-const __dirname = path.resolve(); // Obtener el directorio actual
-
-app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname,  '../Frontend', 'public')));
 
-app.set('views engine', 'ejs');
-app.set('public', path.join(__dirname, '../Frontend', 'public'));
+// Rutas principales
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/user", require("./routes/userRoutes"));
+app.use("/api/productos", require("./routes/productRoutes"));
+app.use("/api/carrito", require("./routes/cartRoutes"));
+app.use("/api/venta", require("./routes/saleRoutes"));
 
-app.use('/', productroutes);
+// Ruta de productos que venía del HEAD
+app.use("/", productroutes);
 
+// Levantar servidor
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
