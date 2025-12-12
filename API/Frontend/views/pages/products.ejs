@@ -1,0 +1,44 @@
+<section class="stack">
+  <div class="stack">
+    <h1 class="h1">Productos</h1>
+    <p class="muted">Explora por búsqueda, categoría o color.</p>
+  </div>
+
+  <form id="filtersForm" class="filters">
+    <div class="field">
+      <div class="label">Buscar</div>
+      <input class="input" id="q" name="q" placeholder="Croquetas, collar, cama..." />
+    </div>
+
+    <div class="field">
+      <div class="label">Categoría</div>
+      <select class="select" id="categoria" name="categoria">
+        <option value="">Todas</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <div class="label">Color</div>
+      <select class="select" id="color" name="color">
+        <option value="">Todos</option>
+      </select>
+    </div>
+
+    <div class="filters-actions">
+      <button class="btn btn-primary" type="submit">Aplicar</button>
+      <button class="btn btn-ghost" id="btnClear" type="button">Limpiar</button>
+    </div>
+  </form>
+
+  <div id="productsGrid" class="product-grid"></div>
+
+  <section class="color-banner">
+    <div class="title">Explorar<br/>Por<br/>Colores</div>
+    <div class="stack" style="align-items:flex-end; gap:14px;">
+      <div class="color-chips" id="colorChips"></div>
+      <a class="btn btn-primary" href="/products">Ver Más</a>
+    </div>
+  </section>
+</section>
+
+<script src="/js/products.js"></script>

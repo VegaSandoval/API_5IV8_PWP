@@ -1,0 +1,35 @@
+<section class="auth-shell">
+  <div class="auth-hero">
+    <h1>Tu tienda<br/>para tus<br/>mascotas</h1>
+    <p>Crea una cuenta para guardar tu carrito y comprar.</p>
+  </div>
+
+  <div class="card card-pad">
+    <h2 class="h2">Registro</h2>
+    <p class="muted">Crea tu cuenta en menos de un minuto.</p>
+
+    <div style="height:18px"></div>
+
+    <form id="registerForm" class="stack">
+      <div class="field">
+        <div class="label">Nombre</div>
+        <input class="input" type="text" id="nombre" placeholder="Tu nombre" required>
+      </div>
+
+      <div class="field">
+        <div class="label">Correo</div>
+        <input class="input" type="email" id="correo" placeholder="correo@ejemplo.com" required>
+      </div>
+
+      <div class="field">
+        <div class="label">Contraseña</div>
+        <input class="input" type="password" id="password" placeholder="Mínimo 8, con símbolo" required>
+      </div>
+
+      <button class="btn btn-primary" type="submit">Registrarse</button>
+      <a class="btn btn-ghost" href="/login">Ya tengo cuenta</a>
+    </form>
+  </div>
+</section>
+
+<script src="/js/auth.js"></script>
