@@ -1,24 +1,17 @@
-import express from 'express';
-import path from 'path';
-//aqui nosotros tenemos que agregar las rutas que se van a consumir
-import productroutes from './routes/productroutes.js';
-
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
 
 const app = express();
-const PORT = process.env.PORT || 3000;  
-
-const __dirname = path.resolve(); // Obtener el directorio actual
-
-app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname,  '../Frontend', 'public')));
 
-app.set('views engine', 'ejs');
-app.set('public', path.join(__dirname, '../Frontend', 'public'));
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/user", require("./routes/userRoutes"));
+app.use("/api/productos", require("./routes/productRoutes"));
+app.use("/api/carrito", require("./routes/cartRoutes"));
+app.use("/api/venta", require("./routes/saleRoutes"));
 
-//vamos a consumir las rutas
-app.use('/', productroutes);
-
-app.listen(PORT, () => {
-    console.log(`Servidor corriendo en el puerto ${PORT}`);
+app.listen(process.env.PORT, () => {
+    console.log("Servidor corriendo en puerto", process.env.PORT);
 });

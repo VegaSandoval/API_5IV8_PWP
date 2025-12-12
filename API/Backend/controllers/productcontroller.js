@@ -1,34 +1,15 @@
-import Product from "../models/productmodel.js";
+const db = require("../config/db");
 
-export const create = (req, res) => {
-    let categoryid = req.body.categoryid;
-    if(!req.body.name || (!isNaN(parseInt(categoryid)) && categoryid === 0)){
-        res.status(400).send({
-            message: 'El nombre del producto y la categoria no pueden estar vacios'
-        });
-        return;
-    }
-
-    const newProduct = new Product({
-        categoryid: req.body.categoryid,
-        name: req.body.name,
-        price: req.body.price,
-        stock: req.body.stock
+exports.getAll = (req, res) => {
+    db.query("SELECT * FROM producto", (err, data) => {
+        if (err) return res.status(500).json({ msg: "Error", err });
+        res.json(data);
     });
+};
 
-    let id = req.body.id;
-    console.log('ID recibido:', id);
-    if(id && id != 0 && typeof parseInt(id) === 'number' ? true : false){Product.id = id}
-
-    console.log('Nuevo producto a crear:', newProduct);
-
-    Product.create(newProduct, (err, data) => {
-        if(err){
-            res.status(500).send({
-                message: err.message || "Ocurrio un error al crear el producto"
-            });
-        }else{
-            res.send({message : `Product ${data.name} con id ${data.id} creado exitosamente & categoria id ${data.categoryid} creada exitosamente`});
-        }
+exports.getOne = (req, res) => {
+    db.query("SELECT * FROM producto WHERE id = ?", [req.params.id], (err, data) => {
+        if (err) return res.status(500).json({ msg: "Error", err });
+        res.json(data[0]);
     });
-}
+};
