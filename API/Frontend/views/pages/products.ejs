@@ -1,44 +1,24 @@
-<section class="stack">
-  <div class="stack">
-    <h1 class="h1">Productos</h1>
-    <p class="muted">Explora por búsqueda, categoría o color.</p>
-  </div>
+<main class="container products-page">
+  <h1 class="h1" id="productsHeading">Productos</h1>
 
-  <form id="filtersForm" class="filters">
-    <div class="field">
-      <div class="label">Buscar</div>
-      <input class="input" id="q" name="q" placeholder="Croquetas, collar, cama..." />
-    </div>
+  <section class="cat-strip" aria-label="Navegación por categorías">
+    <div class="cat-current" id="catCurrent">Ver todo</div>
+    <nav class="cat-scroll" id="catScroll"></nav>
+  </section>
 
-    <div class="field">
-      <div class="label">Categoría</div>
-      <select class="select" id="categoria" name="categoria">
-        <option value="">Todas</option>
-      </select>
-    </div>
+  <section class="products-mosaic" id="productsMount"></section>
 
-    <div class="field">
-      <div class="label">Color</div>
-      <select class="select" id="color" name="color">
-        <option value="">Todos</option>
-      </select>
-    </div>
-
-    <div class="filters-actions">
-      <button class="btn btn-primary" type="submit">Aplicar</button>
-      <button class="btn btn-ghost" id="btnClear" type="button">Limpiar</button>
-    </div>
-  </form>
-
-  <div id="productsGrid" class="product-grid"></div>
-
-  <section class="color-banner">
-    <div class="title">Explorar<br/>Por<br/>Colores</div>
-    <div class="stack" style="align-items:flex-end; gap:14px;">
+  <section class="color-banner card" aria-label="Explorar por colores">
+    <div class="color-banner-inner">
+      <div class="color-banner-title">Explorar<br/>Por<br/>Colores</div>
       <div class="color-chips" id="colorChips"></div>
-      <a class="btn btn-primary" href="/products">Ver Más</a>
     </div>
   </section>
-</section>
+
+  <div class="more-wrap">
+    <button class="btn btn-black" id="btnMore" type="button">Ver Más</button>
+  </div>
+</main>
+
 
 <script src="/js/products.js"></script>

@@ -1,251 +1,330 @@
-const API = "http://localhost:3000/api";
+const API = "/api";
+
 
 function getQS() {
   return new URLSearchParams(window.location.search);
 }
 
-function authHeaders() {
-  const t = localStorage.getItem("token");
-  return t ? { Authorization: `Bearer ${t}` } : {};
+function setQS(next) {
+  const qs = getQS();
+  Object.entries(next).forEach(([k, v]) => {
+    if (v === null || v === undefined || v === "") qs.delete(k);
+    else qs.set(k, v);
+  });
+  const url = `${window.location.pathname}${qs.toString() ? "?" + qs.toString() : ""}`;
+  history.pushState({}, "", url);
+}
+
+function escapeHTML(s) {
+  return String(s ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 function money(n) {
-  const x = Number(n || 0);
-  return x.toLocaleString("es-MX", { style: "currency", currency: "MXN" });
+  const v = Number(n ?? 0);
+  return v.toLocaleString("es-MX", { style: "currency", currency: "MXN" });
 }
 
-function colorMap(nombre) {
-  const v = String(nombre || "").toUpperCase();
-  if (v.includes("ROJO")) return "#d98282";
-  if (v.includes("VERDE LIM")) return "#b8d36a";
-  if (v.includes("AZUL MAR")) return "#45617d";
-  if (v.includes("AZUL CIE")) return "#82bfd1";
-  if (v.includes("MORADO")) return "#b79bd8";
-  if (v.includes("ROSA")) return "#f2a2bd";
-  if (v.includes("AMARIL")) return "#f5d66e";
-  if (v.includes("OSCURO")) return "#4a4e3d";
-  return "#c4d2df";
+function authHeaders() {
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-async function fetchJSON(url, opts={}) {
+async function fetchJSON(url, opts = {}) {
   const res = await fetch(url, opts);
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data?.message || "Error");
+  const text = await res.text();
+  let data = null;
+  try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+
+  if (!res.ok) {
+    const msg = (data && data.error) ? data.error : `Error HTTP ${res.status}`;
+    throw new Error(msg);
+  }
   return data;
 }
 
+const PRODUCT_TILE = {
+  s1: ["#BFC5AD", "#8BA0B5", "#D9AD8D"], 
+  s2: ["#4A4E3D", "#EEE4DF", "#45617D"],
+};
 
-function cardHTML(p) {
-  const c = colorMap(p.color || p.Color || p.color_nombre || "");
+function leftoverPalette(lastFullSkeletonUsed) {
+  if (lastFullSkeletonUsed === 1) return [PRODUCT_TILE.s2[1], PRODUCT_TILE.s2[2]];
+  return [PRODUCT_TILE.s1[0], PRODUCT_TILE.s1[1]];
+}
+
+function productTileHTML(p, bg, posClass) {
+  const id = p.id ?? p.producto_id ?? p.ID ?? p.Id; 
   return `
-    <article class="product-card">
-      <a class="product-media" href="/products/${p.id}">
-        <div class="product-image" style="--p-color:${c}"></div>
-        <button class="fav-btn" type="button" aria-label="Favorito">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M12 21s-7-4.6-9.3-8.6C.8 9 2.6 5.8 6.2 5.3c1.7-.3 3.3.5 3.8 1.4.5-.9 2.1-1.7 3.8-1.4 3.6.5 5.4 3.7 3.5 7.1C19 16.4 12 21 12 21Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-          </svg>
-        </button>
-      </a>
+    <article class="p-tile ${posClass}" style="--p-bg:${bg}">
+      <a class="p-hit" href="/products/${encodeURIComponent(id)}" aria-label="Ver producto"></a>
 
-      <div class="product-body">
-        <div>
-          <div class="product-name">${p.nombre}</div>
-          <div class="muted" style="font-size:13px;">${p.categoria || ""} · ${(p.color || "").toUpperCase()}</div>
-          <div class="product-price">${money(p.precio)}</div>
+      <div class="p-info">
+        <div class="p-text">
+          <div class="p-name">${escapeHTML(p.nombre)}</div>
+          <div class="p-sub">${escapeHTML(p.categoria || "")}</div>
+          <div class="p-price">${money(p.precio)}</div>
         </div>
 
-        <button class="btn btn-primary btn-sm" data-add="${p.id}">Añadir</button>
+        <button class="btn btn-primary btn-sm" type="button" data-add="${escapeHTML(id)}">
+          Añadir
+        </button>
       </div>
     </article>
   `;
 }
 
-async function loadMetadata() {
+function blockS1(items3) {
+  return `
+    <section class="pm-block sk-p1">
+      ${productTileHTML(items3[0], PRODUCT_TILE.s1[0], "pos-big")}
+      ${productTileHTML(items3[1], PRODUCT_TILE.s1[1], "pos-top")}
+      ${productTileHTML(items3[2], PRODUCT_TILE.s1[2], "pos-bot")}
+    </section>
+  `;
+}
+
+function blockS2(items3) {
+  return `
+    <section class="pm-block sk-p2">
+      ${productTileHTML(items3[0], PRODUCT_TILE.s2[0], "pos-big")}
+      ${productTileHTML(items3[1], PRODUCT_TILE.s2[1], "pos-top")}
+      ${productTileHTML(items3[2], PRODUCT_TILE.s2[2], "pos-bot")}
+    </section>
+  `;
+}
+
+function block2(items2, colors2) {
+  return `
+    <section class="pm-block sk-p2up">
+      ${productTileHTML(items2[0], colors2[0], "pos-a")}
+      ${productTileHTML(items2[1], colors2[1], "pos-b")}
+    </section>
+  `;
+}
+
+function block1(item1, color1) {
+  return `
+    <section class="pm-block sk-p1up">
+      ${productTileHTML(item1, color1, "pos-only")}
+    </section>
+  `;
+}
+
+function buildMosaic(products) {
+  let html = "";
+  let i = 0;
+  let next = 1;          
+  let lastUsed = null;  
+
+  while (i < products.length) {
+    const rem = products.length - i;
+
+    if (rem === 1) {
+      const [c1] = leftoverPalette(lastUsed);
+      html += block1(products[i], c1);
+      i += 1;
+      continue;
+    }
+
+    if (rem === 2) {
+      const [c1, c2] = leftoverPalette(lastUsed);
+      html += block2([products[i], products[i + 1]], [c1, c2]);
+      i += 2;
+      continue;
+    }
+
+    const chunk = products.slice(i, i + 3);
+    if (next === 1) {
+      html += blockS1(chunk);
+      lastUsed = 1;
+      next = 2;
+    } else {
+      html += blockS2(chunk);
+      lastUsed = 2;
+      next = 1;
+    }
+    i += 3;
+  }
+
+  return html;
+}
+
+const state = {
+  meta: null,
+  categoria: "",
+  color: "",
+  q: "",
+  all: [],
+  visible: 0,
+};
+
+function readStateFromURL() {
+  const qs = getQS();
+  state.categoria = qs.get("categoria") || "";
+  state.color = qs.get("color") || "";
+  state.q = qs.get("q") || "";
+}
+
+async function getMeta() {
+  if (state.meta) return state.meta;
   const meta = await fetchJSON(`${API}/productos/metadata`);
- 
-  const cats = meta.categorias || [];
-  const cols = meta.colores || [];
+  state.meta = {
+    categorias: Array.isArray(meta.categorias) ? meta.categorias : [],
+    colores: Array.isArray(meta.colores) ? meta.colores : [],
+  };
+  return state.meta;
+}
 
-  const selCat = document.getElementById("categoria");
-  const selCol = document.getElementById("color");
-  const chips = document.getElementById("colorChips");
-  
-  const qs = getQS();
-  if (selCat && qs.get("categoria")) selCat.value = qs.get("categoria");
-  if (selCol && qs.get("color")) selCol.value = qs.get("color");
+function renderCategoryStrip(categorias) {
+  const currentEl = document.getElementById("catCurrent");
+  const scrollEl = document.getElementById("catScroll");
+  if (!currentEl || !scrollEl) return;
 
-  const qInput = document.getElementById("q");
-  if (qInput && qs.get("q")) qInput.value = qs.get("q");
+  const currentName = state.categoria ? state.categoria : "Ver todo";
+  currentEl.textContent = currentName;
 
+  const list = ["", ...categorias].filter((c, idx, arr) => arr.indexOf(c) === idx);
 
-  if (selCat) {
-    selCat.innerHTML = `<option value="">Todas</option>` +
-      cats.map(c => `<option value="${c}">${c}</option>`).join("");
-  }
-  if (selCol) {
-    selCol.innerHTML = `<option value="">Todos</option>` +
-      cols.map(c => `<option value="${c}">${c}</option>`).join("");
-  }
-  if (chips) {
-    chips.innerHTML = cols.slice(0,8).map(c => `
-      <button class="chip" type="button" data-chip-color="${c}">
-        <span class="dot" style="--dot:${colorMap(c)}"></span>
-        ${(String(c)).toUpperCase()}
+  scrollEl.innerHTML = list.map((c) => {
+    const label = c === "" ? "Ver todo" : c;
+    const active = (c === "" && !state.categoria) || c === state.categoria;
+    return `
+      <button class="cat-pill ${active ? "is-active" : ""}" type="button"
+              data-cat="${escapeHTML(c)}" aria-current="${active ? "page" : "false"}">
+        ${escapeHTML(label)}
       </button>
-    `).join("");
-  }
+    `;
+  }).join("");
 }
 
-function currentFilters() {
-  const qs = getQS();
-  const q = document.getElementById("q")?.value ?? qs.get("q") ?? "";
-  const categoria = document.getElementById("categoria")?.value ?? qs.get("categoria") ?? "";
-  const color = document.getElementById("color")?.value ?? qs.get("color") ?? "";
-  const sp = new URLSearchParams();
-  if (q) sp.set("q", q);
-  if (categoria) sp.set("categoria", categoria);
-  if (color) sp.set("color", color);
-  return sp.toString();
+function dotColor(name) {
+  const n = String(name || "").toUpperCase();
+  if (n.includes("ROJO")) return "#D97A83";
+  if (n.includes("VERDE") && n.includes("LIM")) return "#A8C46B";
+  if (n.includes("VERDE")) return "#4A4E3D";
+  if (n.includes("AZUL") && n.includes("MAR")) return "#45617D";
+  if (n.includes("AZUL")) return "#8BA0B5";
+  if (n.includes("AMARIL")) return "#F4D972";
+  if (n.includes("MORAD")) return "#8E6CB5";
+  if (n.includes("ROSA")) return "#E7A7C6";
+  return "#CFCFCF";
 }
 
-async function loadProducts() {
-  const grid = document.getElementById("productsGrid");
-  if (!grid) return;
+function renderColorChips(colores) {
+  const chipsEl = document.getElementById("colorChips");
+  if (!chipsEl) return;
 
-  const qs = currentFilters();
-  const url = `${API}/productos${qs ? `?${qs}` : ""}`;
+  const uniq = colores.filter((c, idx, arr) => arr.indexOf(c) === idx);
 
-  const products = await fetchJSON(url);
-  grid.innerHTML = products.map(cardHTML).join("");
-
-  grid.addEventListener("click", async (e) => {
-    const btn = e.target.closest("[data-add]");
-    if (!btn) return;
-
-    const token = localStorage.getItem("token");
-    if (!token) return (window.location.href = "/login");
-
-    const producto_id = Number(btn.getAttribute("data-add"));
-    await fetchJSON(`${API}/carrito/agregar`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...authHeaders() },
-      body: JSON.stringify({ producto_id, cantidad: 1 })
-    });
-
-    alert("Producto agregado al carrito ✅");
-  }, { once: true });
+  chipsEl.innerHTML = uniq.map((c) => {
+    const active = c === state.color;
+    return `
+      <button class="chip ${active ? "is-active" : ""}" type="button" data-color="${escapeHTML(c)}">
+        <span class="dot" style="--dot:${dotColor(c)}"></span>
+        ${escapeHTML(c)}
+      </button>
+    `;
+  }).join("");
 }
 
-function bindFilters() {
-  const form = document.getElementById("filtersForm");
-  if (!form) return;
+async function fetchProducts() {
+  const qs = new URLSearchParams();
+  if (state.categoria) qs.set("categoria", state.categoria);
+  if (state.color) qs.set("color", state.color);
+  if (state.q) qs.set("q", state.q);
 
-  const qs = getQS();
-  const q = document.getElementById("q");
-  if (q && qs.get("q")) q.value = qs.get("q");
+  const url = `${API}/productos${qs.toString() ? "?" + qs.toString() : ""}`;
+  const data = await fetchJSON(url);
 
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const qs2 = currentFilters();
-    window.location.href = `/products${qs2 ? `?${qs2}` : ""}`;
-  });
-
-  document.getElementById("btnClear")?.addEventListener("click", () => {
-    window.location.href = "/products";
-  });
-
-  document.getElementById("colorChips")?.addEventListener("click", (e) => {
-    const chip = e.target.closest("[data-chip-color]");
-    if (!chip) return;
-    const v = chip.getAttribute("data-chip-color");
-    const selCol = document.getElementById("color");
-    if (selCol) selCol.value = v;
-    form.requestSubmit();
-  });
+  state.all = Array.isArray(data) ? data : [];
 }
 
-
-function getProductIdFromURL() {
-  const parts = window.location.pathname.split("/").filter(Boolean);
-  return parts[0] === "products" && parts[1] ? Number(parts[1]) : null;
-}
-
-async function loadProductDetail() {
-  const mount = document.getElementById("productDetail");
+function renderProducts() {
+  const mount = document.getElementById("productsMount");
   if (!mount) return;
 
-  const id = getProductIdFromURL();
-  if (!id) return;
+  const slice = state.all.slice(0, state.visible);
+  mount.innerHTML = buildMosaic(slice);
 
-  const p = await fetchJSON(`${API}/productos/${id}`);
-  const c = colorMap(p.color || "");
-
-  mount.innerHTML = `
-    <div class="product-shell">
-      <div class="pd-image" style="--p-color:${c}"></div>
-
-      <div class="stack">
-        <h1 class="pd-title">${p.nombre}</h1>
-        <div class="pd-price">${money(p.precio)}</div>
-        <p class="muted">${p.descripcion || "Producto para tu mascota."}</p>
-
-        <div class="row" style="flex-wrap:wrap;">
-          <span class="chip" style="cursor:default;">
-            <span class="dot" style="--dot:${c}"></span>${(p.color || "COLOR").toUpperCase()}
-          </span>
-          ${p.categoria ? `<span class="chip" style="cursor:default;">${p.categoria.toUpperCase()}</span>` : ""}
-        </div>
-
-        <div class="row" style="justify-content:space-between; align-items:center;">
-          <div class="stepper">
-            <button type="button" id="qtyMinus">-</button>
-            <input id="qty" value="1" inputmode="numeric" />
-            <button type="button" id="qtyPlus">+</button>
-          </div>
-
-          <button class="btn btn-primary" id="btnAddToCart">Agregar al carrito</button>
-        </div>
-      </div>
-    </div>
-  `;
-
-  const qty = document.getElementById("qty");
-  document.getElementById("qtyMinus").onclick = () => {
-    const v = Math.max(1, Number(qty.value || 1) - 1);
-    qty.value = String(v);
-  };
-  document.getElementById("qtyPlus").onclick = () => {
-    const v = Math.min(99, Number(qty.value || 1) + 1);
-    qty.value = String(v);
-  };
-
-  document.getElementById("btnAddToCart").onclick = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) return (window.location.href = "/login");
-
-    await fetchJSON(`${API}/carrito/agregar`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...authHeaders() },
-      body: JSON.stringify({ producto_id: id, cantidad: Number(qty.value || 1) })
-    });
-
-    alert("Agregado al carrito ✅");
-  };
-
-  const related = await fetchJSON(`${API}/productos/${id}/relacionados`).catch(() => []);
-  const relMount = document.getElementById("relatedBlock");
-  if (relMount && Array.isArray(related) && related.length) {
-    relMount.innerHTML = `
-      <h2 class="h2">También te puede interesar</h2>
-      <div class="product-grid">${related.map(cardHTML).join("")}</div>
-    `;
+  const btn = document.getElementById("btnMore");
+  if (btn) {
+    btn.style.display = state.visible >= state.all.length ? "none" : "inline-flex";
   }
 }
 
-(async function init(){
-  try { await loadMetadata(); } catch {}
-  bindFilters();
-  await loadProducts().catch(() => {});
-  await loadProductDetail().catch(() => {});
-})();
+function bindInteractions() {
+  document.addEventListener("click", (e) => {
+    const catBtn = e.target.closest("[data-cat]");
+    if (catBtn) {
+      const cat = catBtn.getAttribute("data-cat") || "";
+      setQS({ categoria: cat || "" , color: state.color || "", q: state.q || "" });
+      refresh();
+      return;
+    }
+
+    const chip = e.target.closest("[data-color]");
+    if (chip) {
+      const c = chip.getAttribute("data-color") || "";
+      const nextColor = (c === state.color) ? "" : c; 
+      setQS({ categoria: state.categoria || "", color: nextColor, q: state.q || "" });
+      refresh();
+      return;
+    }
+
+    const add = e.target.closest("[data-add]");
+    if (add) {
+      const producto_id = add.getAttribute("data-add");
+      addToCart(producto_id);
+      return;
+    }
+  });
+
+  const btnMore = document.getElementById("btnMore");
+  if (btnMore) {
+    btnMore.addEventListener("click", () => {
+      if (state.visible === 0) state.visible = Math.min(6, state.all.length);
+      else state.visible = Math.min(state.visible + 9, state.all.length);
+      renderProducts();
+    });
+  }
+
+  window.addEventListener("popstate", () => refresh());
+}
+
+async function addToCart(producto_id) {
+  try {
+    await fetchJSON(`${API}/carrito/agregar`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...authHeaders() },
+      body: JSON.stringify({ producto_id, cantidad: 1 }),
+    });
+  } catch (err) {
+    alert(err.message || "No se pudo agregar al carrito.");
+  }
+}
+
+async function refresh() {
+  readStateFromURL();
+
+  const meta = await getMeta();
+  renderCategoryStrip(meta.categorias);
+  renderColorChips(meta.colores);
+
+  await fetchProducts();
+
+  state.visible = Math.min(6, state.all.length);
+  renderProducts();
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const mount = document.getElementById("productsMount");
+  if (!mount) return;
+
+  bindInteractions();
+  await refresh();
+});
