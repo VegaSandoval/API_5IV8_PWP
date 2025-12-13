@@ -1,16 +1,24 @@
-<section class="hero">
-  <div class="card">
-    <h1>Lo mejor para tu mejor amigo</h1>
-    <p>Compra productos para tu mascota: filtra por categorías y colores, añade al carrito y confirma tu compra.</p>
-    <a class="btn" href="/products">Ver productos</a>
+<section class="stack">
+  <div class="stack" style="gap:8px;">
+    <h1 class="h1">Categorías</h1>
+    <p class="muted">Elige una categoría para explorar productos, o mira todo el catálogo.</p>
   </div>
 
-  <div class="card hero-side">
-    <div>
-      <strong>Tip</strong>
-      <p class="muted" style="margin:8px 0 0 0;">
-        Inicia sesión para guardar tu carrito y comprar.
-      </p>
+  <div id="categoriesGrid" class="category-grid"></div>
+
+  <section id="saludPromo" class="card card-pad hide">
+    <div class="split">
+      <div>
+        <h2 class="h2" style="margin:0;">Salud</h2>
+        <p class="muted" style="margin-top:10px;">
+          No solo nos importa su estilo, aquí hay todo para su salud.
+        </p>
+      </div>
+      <div style="display:flex; justify-content:flex-end; align-items:center;">
+        <a id="saludLink" class="btn btn-primary" href="/products">Leer más</a>
+      </div>
     </div>
-  </div>
+  </section>
 </section>
+
+<script src="/js/home.js"></script>

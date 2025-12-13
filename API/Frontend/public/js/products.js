@@ -70,6 +70,14 @@ async function loadMetadata() {
   const selCat = document.getElementById("categoria");
   const selCol = document.getElementById("color");
   const chips = document.getElementById("colorChips");
+  
+  const qs = getQS();
+  if (selCat && qs.get("categoria")) selCat.value = qs.get("categoria");
+  if (selCol && qs.get("color")) selCol.value = qs.get("color");
+
+  const qInput = document.getElementById("q");
+  if (qInput && qs.get("q")) qInput.value = qs.get("q");
+
 
   if (selCat) {
     selCat.innerHTML = `<option value="">Todas</option>` +

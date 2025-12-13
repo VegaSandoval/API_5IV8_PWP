@@ -492,3 +492,52 @@ button, input, select{ font: inherit; }
 
 /* Helpers */
 .hide{ display:none !important; }
+
+/* Home - Categorías */
+.category-grid{
+  display:grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--s-6);
+}
+
+@media (max-width: 980px){
+  .category-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 620px){
+  .category-grid{ grid-template-columns: 1fr; }
+}
+
+.category-card{
+  border-radius: var(--r-xl);
+  background: rgba(255,255,255,.65);
+  border: 1px solid rgba(193,178,169,.55);
+  box-shadow: var(--shadow-sm);
+  padding: var(--s-6);
+  min-height: 190px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+
+.category-top{ display:flex; flex-direction:column; gap: 10px; }
+
+.category-badge{
+  display:inline-flex;
+  width: fit-content;
+  padding: 6px 10px;
+  border-radius: var(--r-pill);
+  background: rgba(69,97,125,.12);
+  border: 1px solid rgba(69,97,125,.18);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.category-title{
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 28px;
+  line-height: 1.05;
+}
+
+.category-btn{ align-self:flex-start; }

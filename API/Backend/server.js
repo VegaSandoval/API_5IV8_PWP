@@ -39,7 +39,6 @@ function renderWithLayout(res, view, locals = {}) {
   });
 }
 
-// === API (tal cual la tienes) ===
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/user", require("./routes/userRoutes"));
 app.use("/api/productos", require("./routes/productRoutes"));
