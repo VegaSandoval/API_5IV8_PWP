@@ -79,3 +79,10 @@ app.use("/api/venta", require("./routes/saleRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes")); // ← NUEVA RUTA
 
 // ... resto del código ...
+// En tu server.js, AGREGAR esta ruta después de las rutas de API:
+
+app.get("/admin", (req, res) => 
+  renderWithLayout(res, "pages/admin", { title: "Admin Panel" })
+);
+
+// El resto de tus rutas permanecen igual
