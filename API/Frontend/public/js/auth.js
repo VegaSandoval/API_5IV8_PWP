@@ -8,11 +8,18 @@ function showMsg(text, type = "ok") {
   box.style.display = "";
 }
 
+// ============================================
+// LOGIN
+// ============================================
 document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const correo = document.getElementById("correo").value.trim();
   const password = document.getElementById("password").value;
+
+  if (!correo || !password) {
+    return showMsg("Completa todos los campos.", "err");
+  }
 
   try {
     const res = await fetch(`${API_BASE}/auth/login`, {
@@ -27,18 +34,33 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
       return showMsg(data?.msg || "No se pudo iniciar sesión.", "err");
     }
 
-    if (data.token) {
-      localStorage.setItem("token", data.token);
-      window.location.href = "/products";
+    // Guardar AMBOS tokens
+    if (data.accessToken && data.refreshToken) {
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
+      
+      // Guardar info del usuario (opcional)
+      if (data.usuario) {
+        localStorage.setItem("user", JSON.stringify(data.usuario));
+      }
+
+      showMsg("Iniciando sesión...", "ok");
+      setTimeout(() => {
+        window.location.href = "/products";
+      }, 500);
       return;
     }
 
-    showMsg("Respuesta inválida del servidor (sin token).", "err");
-  } catch {
-    showMsg("Error de red.", "err");
+    showMsg("Respuesta inválida del servidor.", "err");
+  } catch (err) {
+    console.error("Error en login:", err);
+    showMsg("Error de red. Verifica tu conexión.", "err");
   }
 });
 
+// ============================================
+// REGISTRO
+// ============================================
 document.getElementById("registerForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -46,6 +68,10 @@ document.getElementById("registerForm")?.addEventListener("submit", async (e) =>
   const telefono = document.getElementById("telefono")?.value.trim() || "";
   const correo = document.getElementById("correo").value.trim();
   const password = document.getElementById("password").value;
+
+  if (!nombre || !correo || !password) {
+    return showMsg("Completa todos los campos obligatorios.", "err");
+  }
 
   try {
     const res = await fetch(`${API_BASE}/auth/register`, {
@@ -60,9 +86,28 @@ document.getElementById("registerForm")?.addEventListener("submit", async (e) =>
       return showMsg(data?.msg || "No se pudo registrar.", "err");
     }
 
-    showMsg("Cuenta creada. Ahora inicia sesión.", "ok");
-    setTimeout(() => (window.location.href = "/login"), 700);
-  } catch {
-    showMsg("Error de red.", "err");
+    // El backend ya devuelve tokens al registrar, podemos logear automáticamente
+    if (data.accessToken && data.refreshToken) {
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
+      
+      if (data.usuario) {
+        localStorage.setItem("user", JSON.stringify(data.usuario));
+      }
+
+      showMsg("¡Cuenta creada! Redirigiendo...", "ok");
+      setTimeout(() => {
+        window.location.href = "/products";
+      }, 700);
+    } else {
+      // Fallback: redirigir a login
+      showMsg("Cuenta creada. Inicia sesión.", "ok");
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 700);
+    }
+  } catch (err) {
+    console.error("Error en register:", err);
+    showMsg("Error de red. Verifica tu conexión.", "err");
   }
 });
