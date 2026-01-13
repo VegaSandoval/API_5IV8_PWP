@@ -67,3 +67,15 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
+
+// ... tus imports ...
+
+// Rutas API
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/user", require("./routes/userRoutes"));
+app.use("/api/productos", require("./routes/productRoutes"));
+app.use("/api/carrito", require("./routes/cartRoutes"));
+app.use("/api/venta", require("./routes/saleRoutes"));
+app.use("/api/admin", require("./routes/adminRoutes")); // ← NUEVA RUTA
+
+// ... resto del código ...
