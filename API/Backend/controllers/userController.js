@@ -1,6 +1,5 @@
-const db = require("../config/db");
-const bcrypt = require("bcryptjs");
-const dbp = db.promise();
+const { promisePool: dbp } = require("../config/db");
+
 
 // ============================================
 // UTILIDADES DE VALIDACIÓN

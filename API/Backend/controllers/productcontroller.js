@@ -1,5 +1,5 @@
-const db = require("../config/db");
-const dbp = db.promise();
+const { promisePool: dbp } = require("../config/db");
+
 
 // Configuración de paginación
 const DEFAULT_PAGE = 1;

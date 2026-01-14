@@ -1,5 +1,5 @@
-const db = require("../config/db");
-const dbp = db.promise();
+const { promisePool: dbp } = require("../config/db");
+
 
 // ============================================
 // GESTIÓN DE PRODUCTOS

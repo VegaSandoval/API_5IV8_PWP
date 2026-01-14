@@ -1,5 +1,5 @@
-const db = require("../config/db");
-const dbp = db.promise();
+const { promisePool: dbp } = require("../config/db");
+
 
 // Límites y configuración
 const MAX_CANTIDAD_POR_PRODUCTO = 999;

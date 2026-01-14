@@ -1,8 +1,7 @@
-const db = require("../config/db");
+const { promisePool: dbp } = require("../config/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const dbp = db.promise();
 
 // ============================================
 // UTILIDADES Y VALIDACIONES

@@ -1,5 +1,5 @@
-const db = require("../config/db");
-const dbp = db.promise();
+const { promisePool: dbp } = require("../config/db");
+
 
 // Métodos de pago válidos
 const METODOS_PAGO = ['efectivo', 'tarjeta', 'transferencia', 'paypal'];

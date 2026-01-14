@@ -39,12 +39,15 @@ function renderWithLayout(res, view, locals = {}) {
   });
 }
 
+// API routes
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/user", require("./routes/userRoutes"));
 app.use("/api/productos", require("./routes/productRoutes"));
 app.use("/api/carrito", require("./routes/cartRoutes"));
 app.use("/api/venta", require("./routes/saleRoutes"));
+app.use("/api/admin", require("./routes/adminRoutes"));
 
+// Front routes
 app.get("/", (req, res) => renderWithLayout(res, "pages/home", { title: "Inicio" }));
 app.get("/products", (req, res) => renderWithLayout(res, "pages/products", { title: "Productos" }));
 app.get("/products/:id", (req, res) =>
@@ -56,6 +59,10 @@ app.get("/login", (req, res) => renderWithLayout(res, "pages/login", { title: "I
 app.get("/register", (req, res) => renderWithLayout(res, "pages/register", { title: "Registrarse" }));
 app.get("/contact", (req, res) => renderWithLayout(res, "pages/contact", { title: "Contacto" }));
 
+// Admin view
+app.get("/admin", (req, res) => renderWithLayout(res, "pages/admin", { title: "Admin Panel" }));
+
+// 404
 app.use((req, res) => {
   if (req.path.startsWith("/api/")) {
     return res.status(404).json({ msg: "Endpoint no encontrado" });
@@ -64,25 +71,4 @@ app.use((req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en el puerto ${PORT}`);
-});
-
-// ... tus imports ...
-
-// Rutas API
-app.use("/api/auth", require("./routes/authRoutes"));
-app.use("/api/user", require("./routes/userRoutes"));
-app.use("/api/productos", require("./routes/productRoutes"));
-app.use("/api/carrito", require("./routes/cartRoutes"));
-app.use("/api/venta", require("./routes/saleRoutes"));
-app.use("/api/admin", require("./routes/adminRoutes")); // ← NUEVA RUTA
-
-// ... resto del código ...
-// En tu server.js, AGREGAR esta ruta después de las rutas de API:
-
-app.get("/admin", (req, res) => 
-  renderWithLayout(res, "pages/admin", { title: "Admin Panel" })
-);
-
-// El resto de tus rutas permanecen igual
+app.listen(PORT, () => console.log(`Servidor corriendo en el puerto ${PORT}`));
