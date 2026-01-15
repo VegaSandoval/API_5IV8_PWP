@@ -1,0 +1,253 @@
+/* HOME */
+.home{
+  padding-bottom: 80px;
+}
+
+/* HERO (Grid grande + 2 cards laterales) */
+.home-hero{
+  padding-top: 24px;
+  padding-bottom: 32px;
+}
+.home-hero__grid{
+  display:grid;
+  grid-template-columns: 1fr 352px;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.card{
+  border-radius: var(--radius-xl);
+  overflow:hidden;
+  position: relative;
+  background: #D9D9D9;
+}
+
+/* HERO principal */
+.card--hero{ height: 770px; }
+.card__media{
+  position:absolute;
+  inset:0;
+  background-size: cover;
+  background-position: center;
+}
+.card__overlay{
+  position:absolute;
+  inset:0;
+  background: transparent;
+}
+.heroCopy{
+  position:absolute;
+  left: 60px;
+  top: 60px;
+  width: 328px;
+  display:flex;
+  flex-direction:column;
+  gap: 28px;
+}
+.heroCopy__title{
+  margin:0;
+  font-family: Poppins, Inter, sans-serif;
+  font-weight: 400;
+  font-size: 90px;
+  line-height: 75px;
+  letter-spacing: -5px;
+  color: var(--dark);
+}
+.heroCopy__text{
+  margin:0;
+  font-family: Nunito, Inter, sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 26px;
+  letter-spacing: -0.3px;
+  color: var(--dark);
+  opacity: .8;
+}
+
+/* Lateral */
+.home-hero__side{
+  display:flex;
+  flex-direction:column;
+  gap: 10px;
+}
+.card--side{ height: 380px; }
+.card__label{
+  position:absolute;
+  left: 30px;
+  top: 30px;
+  margin:0;
+  font-family: Poppins, Inter, sans-serif;
+  font-weight: 400;
+  font-size: 40px;
+  line-height: 40px;
+  letter-spacing: -3px;
+  color: var(--dark);
+}
+.card--dark .card__label{ color: #E4E6DD; }
+
+/* STRIP “Camas” + 2 cards */
+.home-strip{
+  padding: 0;
+}
+.home-strip__grid{
+  display:grid;
+  grid-template-columns: 411px 1fr;
+  gap: 10px;
+  align-items: stretch;
+}
+.stripCopy{
+  height: 380px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap: 42px;
+}
+.stripCopy__title{
+  margin:0;
+  font-family: Poppins, Inter, sans-serif;
+  font-weight: 400;
+  font-size: 65px;
+  line-height: 65px;
+  letter-spacing: -4px;
+  color: var(--brown-2);
+}
+.stripCopy__text{
+  margin:0;
+  font-size: 22px;
+  line-height: 26px;
+  letter-spacing: -0.3px;
+  color: var(--brown-2);
+  opacity:.8;
+}
+
+/* 2 cards a la derecha */
+.home-strip__cards{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.stripCard{
+  height: 380px;
+}
+.stripCard__row{
+  position:absolute;
+  left: 30px;
+  bottom: 30px;
+  right: 30px;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap: 16px;
+}
+.stripCard__title{
+  margin:0;
+  font-family: Poppins, Inter, sans-serif;
+  font-weight: 400;
+  font-size: 40px;
+  line-height: 40px;
+  letter-spacing: -3px;
+}
+
+/* MOSAICO (4 cápsulas) -> lo conectamos a tu #homeMosaic */
+.home-mosaicWrap{
+  padding-top: 44px;
+}
+#homeMosaic{
+  display:grid;
+  grid-template-columns: repeat(4, minmax(220px, 1fr));
+  gap: 22px;
+  align-items: stretch;
+}
+.mosaicItem{
+  height: 400px;
+  border-radius: var(--radius-pill);
+  position: relative;
+  overflow:hidden;
+  text-decoration:none;
+  color: inherit;
+}
+.mosaicItem__title{
+  position:absolute;
+  left: 31px;
+  top: 170px;
+  margin:0;
+  font-family: Poppins, Inter, sans-serif;
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 65px;
+  letter-spacing: -4px;
+}
+.mosaicItem__text{
+  position:absolute;
+  left: 31px;
+  top: 235px;
+  width: 202px;
+  margin:0;
+  font-size: 20px;
+  line-height: 26px;
+  letter-spacing: -0.3px;
+  opacity: .8;
+}
+
+/* SALUD/Blog (tu sección actual, pero estilo Figma Blog) */
+.home-blog{
+  padding: 80px 0 0;
+}
+.home-blog__title{
+  margin:0 0 30px;
+  font-family: Poppins, Inter, sans-serif;
+  font-weight: 400;
+  font-size: 35px;
+  line-height: 38px;
+  letter-spacing: -1px;
+  color: #121212;
+}
+.home-blog__row{
+  display:grid;
+  grid-template-columns: 654px 1fr;
+  gap: 60px;
+  align-items: center;
+}
+.blogImage{
+  height: 367px;
+}
+.blogCopy{
+  display:flex;
+  flex-direction:column;
+  gap: 24px;
+}
+.blogCopy h2{
+  margin:0;
+  font-family: Inter, sans-serif;
+  font-weight: 400;
+  font-size: 60px;
+  line-height: 65px;
+  letter-spacing: -3px;
+  color: #121212;
+}
+.blogCopy p{
+  margin:0;
+  font-size: 18px;
+  line-height: 26px;
+  letter-spacing: -0.3px;
+  color: #121212;
+  opacity:.8;
+}
+
+/* Responsive */
+@media (max-width: 1024px){
+  .home-hero__grid{ grid-template-columns: 1fr; }
+  .home-hero__side{ flex-direction: row; }
+  .card--side{ flex: 1; }
+  .home-strip__grid{ grid-template-columns: 1fr; }
+  .home-strip__cards{ grid-template-columns: 1fr; }
+  #homeMosaic{ grid-template-columns: repeat(2, minmax(180px, 1fr)); }
+  .home-blog__row{ grid-template-columns: 1fr; }
+  .blogImage{ width: 100%; }
+}
+@media (max-width: 560px){
+  .heroCopy{ left: 18px; top: 18px; width: calc(100% - 36px); }
+  .heroCopy__title{ font-size: 56px; line-height: 52px; letter-spacing: -2px; }
+  .card--hero{ height: 560px; }
+  #homeMosaic{ grid-template-columns: 1fr; }
+}

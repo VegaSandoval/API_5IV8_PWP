@@ -19,6 +19,11 @@ app.use(express.static(PUBLIC_DIR));
 app.set("views", VIEWS_DIR);
 app.set("view engine", "ejs");
 
+import webRoutes from "./routes/webRoutes.js"; // ajusta la ruta si tu app.js está en otra carpeta
+
+app.use("/", webRoutes);
+
+
 function renderWithLayout(res, view, locals = {}) {
   const pageFile = path.join(VIEWS_DIR, `${view}.ejs`);
   const layoutFile = path.join(VIEWS_DIR, "layouts", "main.ejs");
