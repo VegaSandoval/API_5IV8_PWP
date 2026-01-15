@@ -19,11 +19,6 @@ app.use(express.static(PUBLIC_DIR));
 app.set("views", VIEWS_DIR);
 app.set("view engine", "ejs");
 
-import webRoutes from "./routes/webRoutes.js"; // ajusta la ruta si tu app.js está en otra carpeta
-
-app.use("/", webRoutes);
-
-
 function renderWithLayout(res, view, locals = {}) {
   const pageFile = path.join(VIEWS_DIR, `${view}.ejs`);
   const layoutFile = path.join(VIEWS_DIR, "layouts", "main.ejs");
@@ -53,11 +48,27 @@ app.use("/api/venta", require("./routes/saleRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
 
 // Front routes
-app.get("/", (req, res) => renderWithLayout(res, "pages/home", { title: "Inicio" }));
-app.get("/products", (req, res) => renderWithLayout(res, "pages/products", { title: "Productos" }));
+app.get("/", (req, res) =>
+  renderWithLayout(res, "pages/home", {
+    title: "Inicio",
+    pageCss: "/css/pages/home.css",
+    pageJs: "/js/home.js",
+  })
+);
+
+// ✅ IMPORTANTE: para que funcione el filtro desde Home
+app.get("/products", (req, res) =>
+  renderWithLayout(res, "pages/products", {
+    title: "Productos",
+    pageCss: "/css/pages/products.css",   // si no existe, borra esta línea
+    pageJs: "/js/products.js",
+  })
+);
+
 app.get("/products/:id", (req, res) =>
   renderWithLayout(res, "pages/product-detail", { title: "Detalle de producto" })
 );
+
 app.get("/cart", (req, res) => renderWithLayout(res, "pages/cart", { title: "Carrito" }));
 app.get("/profile", (req, res) => renderWithLayout(res, "pages/profile", { title: "Mi cuenta" }));
 app.get("/login", (req, res) => renderWithLayout(res, "pages/login", { title: "Iniciar sesión" }));

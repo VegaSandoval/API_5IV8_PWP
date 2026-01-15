@@ -1,19 +1,25 @@
-<section class="stack">
-  <h1 class="h1">Productos</h1>
+<section class="products">
+  <section class="products__wrap">
+    <div class="container">
+      <div class="products__body">
+        <div class="products__header">
+          <h1 id="productsTitle" class="products__title">Productos</h1>
+          <div id="catScroll" class="products__cats" aria-label="Categorías"></div>
+        </div>
 
-  <div id="catScroll" class="cat-scroll"></div>
+        <div id="productsMount" class="products__grid"></div>
 
-  <div id="productsMount" class="products-mount"></div>
+        <div class="products__more">
+          <button class="products__moreBtn" id="btnMore" type="button">Ver Más</button>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <div class="row" style="justify-content:center; margin-top: 14px;">
-    <button class="btn btn-ghost" id="btnMore" type="button">Ver más</button>
-  </div>
-
-  <div class="card card-pad" style="max-width: 680px; margin: 26px auto 0;">
-    <div class="h3" style="margin-bottom: 6px;">Explorar</div>
-    <div class="muted" style="margin-bottom: 12px;">Por colores</div>
-    <div id="colorChips" class="chips"></div>
-  </div>
+  <section class="colors">
+    <div class="container colors__content">
+      <h2 class="colors__title">Explorar<br/>Por Colores</h2>
+      <div id="colorChips" class="colors__chips"></div>
+    </div>
+  </section>
 </section>
-
-<script src="/js/products.js"></script>

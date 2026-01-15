@@ -1,0 +1,102 @@
+:root{
+  --danger: #d64a4a;
+}
+
+/* tipografías rápidas */
+.h1{ font-family: Poppins, Inter, sans-serif; font-weight: 700; font-size: 28px; margin: 0 0 14px; }
+.h2{ font-family: Poppins, Inter, sans-serif; font-weight: 700; font-size: 20px; margin: 0 0 6px; }
+.h3{ font-family: Poppins, Inter, sans-serif; font-weight: 700; font-size: 18px; margin: 0; }
+.muted{ color: var(--muted); }
+
+.stack{ display:flex; flex-direction:column; gap: 14px; }
+
+/* layout */
+.cart-layout{
+  display:grid;
+  grid-template-columns: 1.4fr .8fr;
+  gap: 24px;
+}
+
+.card{
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 18px;
+}
+.card-pad{ padding: 18px; }
+.card-pad-sm{ padding: 14px; }
+
+.row{ display:flex; gap: 12px; align-items:center; }
+
+/* item */
+.cart-item{
+  display:grid;
+  grid-template-columns: 72px 1fr auto;
+  gap: 14px;
+  align-items:center;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(0,0,0,.08);
+  background: rgba(255,255,255,.9);
+}
+.cart-item.out-of-stock{
+  border-color: rgba(214,74,74,.35);
+  background: rgba(214,74,74,.06);
+}
+.cart-thumb{
+  width: 72px;
+  height: 72px;
+  border-radius: 14px;
+  background: var(--p-color, #c4d2df);
+}
+.cart-meta .name{
+  font-family: Poppins, Inter, sans-serif;
+  font-weight: 600;
+}
+.cart-meta .sub{
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.cart-right{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap: 10px;
+}
+
+/* stepper */
+.stepper{
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+  border: 1px solid rgba(0,0,0,.16);
+  border-radius: 999px;
+  padding: 6px 10px;
+}
+.stepper button{
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 0;
+  cursor: pointer;
+  background: rgba(0,0,0,.06);
+}
+.stepper input{
+  width: 34px;
+  text-align:center;
+  border: 0;
+  background: transparent;
+  font-weight: 700;
+  outline: 0;
+}
+
+.link-danger{
+  color: var(--danger);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* responsive */
+@media (max-width: 980px){
+  .cart-layout{ grid-template-columns: 1fr; }
+}

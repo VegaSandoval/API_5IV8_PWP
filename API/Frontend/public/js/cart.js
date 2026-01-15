@@ -26,7 +26,7 @@ function colorMap(nombre) {
 async function fetchJSON(url, opts = {}) {
   const res = await fetch(url, opts);
   const data = await res.json().catch(() => ({}));
-  
+
   // Manejar token expirado
   if (res.status === 401) {
     localStorage.removeItem("accessToken");
@@ -35,11 +35,11 @@ async function fetchJSON(url, opts = {}) {
     window.location.href = "/login";
     throw new Error("Sesión expirada");
   }
-  
+
   if (!res.ok) {
     throw new Error(data?.msg || "Error en la petición");
   }
-  
+
   return data;
 }
 
@@ -51,13 +51,19 @@ async function loadCart() {
   }
 
   try {
-    const data = await fetchJSON(`${API}/carrito`, { 
-      headers: authHeaders() 
+    const data = await fetchJSON(`${API}/carrito`, {
+      headers: authHeaders()
     });
+
+    // ✅ actualizar badge del navbar (mini-carrito)
+    try {
+      const count = (data.items || []).reduce((acc, it) => acc + Number(it.cantidad || 0), 0);
+      window.dispatchEvent(new CustomEvent("cart:changed", { detail: { count } }));
+    } catch (_) {}
 
     const container = document.getElementById("cartItems");
     const totalEl = document.getElementById("cartTotal");
-    
+
     if (!container || !totalEl) return;
 
     container.innerHTML = "";
@@ -76,7 +82,7 @@ async function loadCart() {
     data.items.forEach(item => {
       const c = colorMap(item.color || "");
       const stockSuficiente = item.stock_suficiente !== false;
-      
+
       container.innerHTML += `
         <div class="cart-item ${!stockSuficiente ? 'out-of-stock' : ''}">
           <div class="cart-thumb" style="--p-color:${c}"></div>
@@ -100,8 +106,7 @@ async function loadCart() {
     });
 
     totalEl.textContent = `Total: ${money(data.total || 0)}`;
-    
-    // Deshabilitar botón de compra si hay productos sin stock
+
     const btnBuy = document.getElementById("btnBuy");
     if (btnBuy && data.productos_sin_stock > 0) {
       btnBuy.disabled = true;
@@ -161,14 +166,14 @@ document.addEventListener("click", async (e) => {
     await loadCart();
   } catch (err) {
     alert(err.message || "No se pudo actualizar la cantidad");
-    await loadCart(); // Recargar para mostrar valores correctos
+    await loadCart();
   }
 });
 
 // Vaciar carrito
 document.getElementById("btnEmpty")?.addEventListener("click", async () => {
   if (!confirm("¿Seguro que deseas vaciar tu carrito?")) return;
-  
+
   try {
     await fetchJSON(`${API}/carrito/vaciar`, {
       method: "DELETE",
@@ -180,9 +185,8 @@ document.getElementById("btnEmpty")?.addEventListener("click", async () => {
   }
 });
 
-// Comprar - AHORA CON MÉTODO DE PAGO
+// Comprar
 document.getElementById("btnBuy")?.addEventListener("click", async () => {
-  // Mostrar selector de método de pago
   const metodo = prompt(
     "Selecciona método de pago:\n1 = Efectivo\n2 = Tarjeta\n3 = Transferencia\n4 = PayPal",
     "2"
@@ -196,7 +200,7 @@ document.getElementById("btnBuy")?.addEventListener("click", async () => {
   };
 
   const metodo_pago = metodos[metodo];
-  
+
   if (!metodo_pago) {
     alert("Método de pago no válido");
     return;
@@ -216,7 +220,6 @@ document.getElementById("btnBuy")?.addEventListener("click", async () => {
   }
 });
 
-// Cargar carrito al iniciar
 loadCart().catch(() => {
   console.error("Error inicial al cargar carrito");
 });

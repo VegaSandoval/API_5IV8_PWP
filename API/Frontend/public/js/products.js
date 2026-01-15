@@ -18,7 +18,6 @@ async function fetchJSON(url, opts = {}) {
   const data = await res.json().catch(() => ({}));
 
   if (res.status === 401) {
-    // sesión expirada
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
@@ -75,50 +74,87 @@ async function getMeta() {
   return { categorias, colores };
 }
 
+function renderTitle() {
+  const el = document.getElementById("productsTitle");
+  if (!el) return;
+  el.textContent = state.categoria ? state.categoria : "Ver todo";
+}
+
 function renderCategoryStrip(categorias) {
   const scrollEl = document.getElementById("catScroll");
   if (!scrollEl) return;
 
   const list = ["", ...categorias]; // "" = Ver todo
 
-  scrollEl.innerHTML = list.map((c) => {
-    const label = c === "" ? "Ver todo" : c;
-    const active = (c === "" && !state.categoria) || c === state.categoria;
-    return `
-      <button class="cat-pill ${active ? "is-active" : ""}" type="button"
-              data-cat="${escapeHTML(c)}" aria-current="${active ? "page" : "false"}">
-        ${escapeHTML(label)}
-      </button>
-    `;
-  }).join("");
+  scrollEl.innerHTML = list
+    .map((c) => {
+      const label = c === "" ? "Ver todo" : c;
+      const active = (c === "" && !state.categoria) || c === state.categoria;
+      return `
+        <button class="pill ${active ? "is-active" : ""}" type="button"
+                data-cat="${escapeHTML(c)}" aria-current="${active ? "page" : "false"}">
+          ${escapeHTML(label)}
+        </button>
+      `;
+    })
+    .join("");
 }
 
 function dotColor(name) {
-  const n = String(name || "").toUpperCase();
-  if (n.includes("ROJO")) return "#D97A83";
-  if (n.includes("VERDE") && n.includes("LIM")) return "#A8C46B";
-  if (n.includes("VERDE")) return "#4A4E3D";
-  if (n.includes("AZUL") && n.includes("MAR")) return "#45617D";
-  if (n.includes("AZUL")) return "#8BA0B5";
-  if (n.includes("AMARIL")) return "#F4D972";
-  if (n.includes("MORAD")) return "#8E6CB5";
-  if (n.includes("ROSA")) return "#E7A7C6";
-  return "#CFCFCF";
+  let raw = String(name || "").trim();
+  if (!raw) return "#BFC5AD";
+
+  // quitar acentos para que "CAFÉ" funcione como "CAFE"
+  const n = raw
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase();
+
+  // si ya viene en HEX, úsalo directo
+  if (/^#([0-9A-F]{3}|[0-9A-F]{6})$/i.test(raw)) return raw;
+
+  // mapeos principales (tu estilo Figma)
+  if (n.includes("ROJO")) return "#E25F5F";
+  if (n.includes("ROSA")) return "#F44E8A";
+  if (n.includes("MORAD")) return "#B54EF4";
+  if (n.includes("AMARIL")) return "#F4CF4E";
+
+  if (n.includes("AZUL") && n.includes("MAR")) return "#233C6B";
+  if (n.includes("AZUL")) return "#5FABE2";
+
+  if (n.includes("VERDE") && (n.includes("LIM") || n.includes("LIMA"))) return "#B8E25F";
+  if (n.includes("VERDE")) return "#44936D";
+
+  // ✅ extras que te faltan
+  if (n.includes("BLANCO")) return "#F5F5F5";
+  if (n.includes("GRIS") || n.includes("GRAY")) return "#B9B9B9";
+  if (n.includes("NEGRO") || n.includes("BLACK")) return "#121212";
+  if (n.includes("CAFE") || n.includes("MARRON") || n.includes("BROWN")) return "#84553C";
+  if (n.includes("BEIGE") || n.includes("CREMA") || n.includes("CREAM")) return "#EAD8CD";
+
+  // ✅ cualquier color desconocido -> color consistente por hash (para que "sea un color" siempre)
+  let h = 0;
+  for (let i = 0; i < n.length; i++) h = (h * 31 + n.charCodeAt(i)) >>> 0;
+  const hue = h % 360;
+  return `hsl(${hue} 35% 70%)`;
 }
+
 
 function renderColorChips(colores) {
   const chipsEl = document.getElementById("colorChips");
   if (!chipsEl) return;
 
-  chipsEl.innerHTML = colores.map((c) => {
-    const active = c === state.color;
-    return `
-      <button class="chip ${active ? "is-active" : ""}" type="button" data-color="${escapeHTML(c)}">
-        <span class="dot" style="--dot:${dotColor(c)}"></span>
-        ${escapeHTML(c)}
-      </button>
-    `;
-  }).join("");
+  chipsEl.innerHTML = colores
+    .map((c) => {
+      const active = c === state.color;
+      return `
+        <button class="chip ${active ? "is-active" : ""}" type="button" data-color="${escapeHTML(c)}">
+          <span class="dot" style="--dot:${dotColor(c)}"></span>
+          ${escapeHTML(c)}
+        </button>
+      `;
+    })
+    .join("");
 }
 
 function extractProducts(data) {
@@ -137,7 +173,6 @@ async function fetchProducts() {
 
   const url = `${API}/productos${qs.toString() ? "?" + qs.toString() : ""}`;
   const data = await fetchJSON(url);
-
   state.all = extractProducts(data);
 }
 
@@ -146,59 +181,81 @@ function normalizeProduct(p) {
   return {
     id,
     nombre: p.nombre ?? p.name ?? "Producto",
-    descripcion: p.descripcion ?? "",
     precio: Number(p.precio ?? 0),
-    categoria: p.categoria ?? "",
-    color: p.color ?? "",
-    stock: p.stock ?? p.existencias ?? null,
-    imagen: p.imagen ?? p.image ?? "/images/product-placeholder.png",
+    imagen: p.imagen ?? p.image ?? "",
+    color: p.color ?? p.colour ?? "", // para el fondo cuando no hay imagen
   };
 }
 
-function productCardHTML(pRaw) {
+function mediaBg(p, index) {
+  // si el producto trae color -> úsalo SIEMPRE
+  if (p?.color) return dotColor(p.color);
+
+  // si no trae color -> paleta tipo figma
+  const palette = ["#BFC5AD", "#8BA0B5", "#D9AD8D", "#4A4E3D", "#F3D9C8", "#45617D"];
+  return palette[index % palette.length];
+}
+
+
+function productCardHTML(pRaw, index) {
   const p = normalizeProduct(pRaw);
+  const id = encodeURIComponent(p.id);
+  const name = escapeHTML(p.nombre);
   const price = isFinite(p.precio) ? `$${p.precio.toFixed(2)}` : "$0.00";
 
-  // fallback de imagen si tu placeholder no existe
-  const safeImg = escapeHTML(p.imagen || "/images/product-placeholder.png");
-  const id = encodeURIComponent(p.id);
+  // Layout tipo Figma: 3-3-6 / 6-3-3
+  const spans = ["span-3", "span-3", "span-6", "span-6", "span-3", "span-3"];
+  const spanClass = spans[index % spans.length] || "span-3";
+
+  const bg = mediaBg(p, index);
+  const img = p.imagen ? escapeHTML(p.imagen) : "";
+  const missingClass = img ? "" : "is-missing";
 
   return `
-    <article class="card" style="padding:14px; display:flex; gap:12px; align-items:center;">
-      <img src="${safeImg}" alt="${escapeHTML(p.nombre)}"
-           style="width:74px; height:74px; border-radius:14px; object-fit:cover;"
-           onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2274%22 height=%2274%22><rect width=%2274%22 height=%2274%22 rx=%2214%22 fill=%22%23e9e3de%22/><text x=%2250%25%22 y=%2252%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%237a6f68%22 font-family=%22Arial%22 font-size=%2210%22>Sin imagen</text></svg>';">
-      <div style="flex:1; min-width:0;">
-        <div class="h3" style="margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-          ${escapeHTML(p.nombre)}
-        </div>
-        <div class="muted" style="margin-top:4px;">
-          ${escapeHTML(p.categoria)}${p.color ? " · " + escapeHTML(p.color) : ""}
-        </div>
-        <div class="h3" style="margin-top:8px;">${escapeHTML(price)}</div>
+    <article class="productCard ${spanClass}">
+      <a class="productCard__media ${missingClass}" href="/products/${id}" style="--bg:${escapeHTML(bg)}">
+        ${
+          img
+            ? `<img src="${img}" alt="${name}" loading="lazy" decoding="async"
+                 onerror="this.remove(); this.parentElement.classList.add('is-missing');">`
+            : ``
+        }
+        <span class="productCard__ghost">Sin imagen</span>
+      </a>
+
+      <div>
+        <div class="productCard__name">${name}</div>
+        <div class="productCard__price">${escapeHTML(price)}</div>
       </div>
 
-      <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
-        <a class="btn btn-ghost" href="/products/${id}">Ver</a>
-        <button class="btn btn-primary" type="button" data-add="${escapeHTML(String(p.id))}">Añadir</button>
+      <!-- ✅ aparece al hover, dentro del card -->
+      <div class="productCard__addWrap">
+        <button class="btn btn-ghost btn-sm productCard__addBtn"
+                type="button"
+                data-add-cart="${escapeHTML(p.id)}">
+          Agregar al carrito
+        </button>
       </div>
     </article>
   `;
 }
+
 
 function renderProducts() {
   const mount = document.getElementById("productsMount");
   if (!mount) return;
 
   const slice = state.all.slice(0, state.visible);
+
+  // ✅ Mensaje EXACTO cuando no hay productos (por categoría o filtros)
   if (slice.length === 0) {
-    mount.innerHTML = `<div class="card card-pad-sm">No hay productos para mostrar.</div>`;
-  } else {
     mount.innerHTML = `
-      <div class="stack" style="max-width:720px; margin:0 auto;">
-        ${slice.map(productCardHTML).join("")}
+      <div class="products-empty">
+        <div class="products-empty__msg">No hay productos disponibles por el momento</div>
       </div>
     `;
+  } else {
+    mount.innerHTML = slice.map(productCardHTML).join("");
   }
 
   const btn = document.getElementById("btnMore");
@@ -218,16 +275,9 @@ function bindInteractions() {
     const chip = e.target.closest("[data-color]");
     if (chip) {
       const c = chip.getAttribute("data-color") || "";
-      const nextColor = (c === state.color) ? "" : c;
+      const nextColor = c === state.color ? "" : c;
       setQS({ categoria: state.categoria || "", color: nextColor, q: state.q || "" });
       refresh();
-      return;
-    }
-
-    const add = e.target.closest("[data-add]");
-    if (add) {
-      const producto_id = add.getAttribute("data-add");
-      addToCart(producto_id);
       return;
     }
   });
@@ -243,21 +293,9 @@ function bindInteractions() {
   window.addEventListener("popstate", () => refresh());
 }
 
-async function addToCart(producto_id) {
-  try {
-    await fetchJSON(`${API}/carrito/agregar`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...authHeaders() },
-      body: JSON.stringify({ producto_id, cantidad: 1 }),
-    });
-    alert("Producto agregado al carrito ✅");
-  } catch (err) {
-    alert(err.message || "No se pudo agregar al carrito.");
-  }
-}
-
 async function refresh() {
   readStateFromURL();
+  renderTitle();
 
   const meta = await getMeta();
   renderCategoryStrip(meta.categorias);

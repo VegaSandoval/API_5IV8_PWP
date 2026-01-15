@@ -1,19 +1,135 @@
 <section class="home">
-  <div id="homeMosaic" class="home-mosaic"></div>
+  <!-- HERO -->
+  <section class="home-hero">
+    <div class="container home-hero__grid">
+      <!-- Card grande (AHORA: VER TODO) -->
+      <article class="card card--hero">
+        <div class="card__media" style="background:#BFC5AD;"></div>
 
-  <section id="saludSection" class="home-salud hide">
-    <div class="home-salud-title">SALUD</div>
+        <div class="heroCopy">
+          <div>
+            <h1 class="heroCopy__title">Ver<br/>todo</h1>
+            <p class="heroCopy__text">
+              Explora todo el catálogo para tu mejor amigo, en un solo lugar.
+            </p>
+          </div>
 
-    <div class="home-salud-grid">
-      <div class="home-salud-media"></div>
+          <a id="heroAllBtn" class="btn btn--primary" data-cat="__ALL__" href="/products">VER CATÁLOGO</a>
+        </div>
+      </article>
 
-      <div class="home-salud-copy">
-        <h2>No solo nos importa su estilo, aquí hay todo para su salud.</h2>
-        <p>
-          Desde antiparasitarios hasta vitaminas y suplementos que garantizan una vida activa y feliz.
-        </p>
+      <!-- 2 cards laterales -->
+      <div class="home-hero__side">
+        <a class="card card--side" data-cat="Snacks y premios" href="/products">
+          <div class="card__media" style="background:#8BA0B5;"></div>
+          <h3 class="card__label">Snacks y premios</h3>
+        </a>
 
-        <a id="saludLink" class="btn btn-ghost" href="/products">VER MÁS</a>
+        <a class="card card--side card--dark" data-cat="Comida húmeda en lata" href="/products">
+          <div class="card__media" style="background:#4A4E3D;"></div>
+          <h3 class="card__label">Comida húmeda en lata</h3>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STRIP: Camas + 2 tarjetas -->
+  <section class="home-strip">
+    <div class="container home-strip__grid">
+      <div class="stripCopy">
+        <div>
+          <h2 class="stripCopy__title">Camas</h2>
+          <p class="stripCopy__text">El mejor descanso para tu mascota,</p>
+        </div>
+        <a class="btn btn--brown" data-cat="Camas" href="/products">VER MÁS</a>
+      </div>
+
+      <div class="home-strip__cards">
+        <a class="card stripCard" data-cat="Casas o Casetas" href="/products">
+          <div class="card__media" style="background:#F3D9C8;"></div>
+          <div class="stripCard__row">
+            <h3 class="stripCard__title" style="color: var(--brown-2);">Casas o Casetas</h3>
+            <span class="stripCard__arrow" style="color: var(--brown-2);">↗</span>
+          </div>
+        </a>
+
+        <a class="card stripCard" data-cat="Correas y Collares" href="/products">
+          <div class="card__media" style="background:#BFC5AD;"></div>
+          <div class="stripCard__row">
+            <h3 class="stripCard__title" style="color: var(--dark);">Correas y Collares</h3>
+            <span class="stripCard__arrow" style="color: var(--dark);">↗</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ✅ MITAD FALTANTE: Arcos + 3 tarjetas -->
+  <section class="home-mosaicFull">
+    <div class="container">
+
+      <!-- 4 “arcos” -->
+      <div class="home-arcs">
+        <a class="arc arc--blue" data-cat="Suéteres" href="/products">
+          <h3 class="arc__title">Suéteres</h3>
+          <p class="arc__text">Prendas para mantener a tu perro abrigado</p>
+        </a>
+
+        <a class="arc arc--navy" data-cat="Camisetas" href="/products">
+          <h3 class="arc__title">Camisetas</h3>
+          <p class="arc__text">Prendas cómodas y ligeras para tu perro en climas frescos.</p>
+        </a>
+
+        <a class="arc arc--sand" data-cat="Impermeables" href="/products">
+          <h3 class="arc__title">Impermeables</h3>
+          <p class="arc__text">Protección contra la lluvia y el viento.</p>
+        </a>
+
+        <a class="arc arc--peach" data-cat="Accesorios" href="/products">
+          <h3 class="arc__title">Accesorios</h3>
+          <p class="arc__text">Detalles divertidos y elegantes para el estilo de tu perro.</p>
+        </a>
+      </div>
+
+      <!-- 3 tarjetas (✅ aquí movemos Croquetas al tile grande) -->
+      <div class="home-cards3">
+        <a class="homeCard homeCard--dark" data-cat="Arnés de Paseo" href="/products">
+          <h3 class="homeCard__title">Arnés de Paseo</h3>
+        </a>
+
+        <a class="homeCard homeCard--mid" data-cat="Platos y Bebederos" href="/products">
+          <h3 class="homeCard__title">Platos y Bebederos</h3>
+        </a>
+
+        <!-- ✅ Antes era “Platos y Bebederos” duplicado, ahora será Croquetas -->
+        <a class="homeCard homeCard--wide" data-cat="Croquetas Premium" href="/products">
+          <h3 class="homeCard__title">Croquetas Premium</h3>
+        </a>
+      </div>
+
+      <!-- (Opcional) aquí salen categorías extra detectadas en metadata -->
+      <div id="homeExtraCats" class="home-extraCats hide"></div>
+
+    </div>
+  </section>
+
+  <!-- SALUD (ya NO blog; es categoría) -->
+  <section id="saludSection" class="home-blog">
+    <div class="container">
+      <h2 class="home-blog__title">SALUD</h2>
+
+      <div class="home-blog__row">
+        <div class="card blogImage">
+          <div class="card__media" style="background:#D9AD8D;"></div>
+        </div>
+
+        <div class="blogCopy">
+          <h2>No solo nos importa su estilo, aquí hay todo para su salud.</h2>
+          <p>
+            Desde antiparasitarios hasta vitaminas y suplementos que garantizan una vida activa y feliz.
+          </p>
+          <a id="saludLink" class="btn btn--outline" data-cat="Salud" href="/products">VER PRODUCTOS</a>
+        </div>
       </div>
     </div>
   </section>
