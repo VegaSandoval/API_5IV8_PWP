@@ -1,30 +1,54 @@
-<section class="auth-shell">
-  <div class="auth-hero">
-    <h1>Lo mejor<br/>para tu<br/>mejor amigo</h1>
-    <p>Inicia sesión para agregar productos al carrito y comprar.</p>
-  </div>
+<section class="authPage">
+  <div class="authGrid">
+    <div class="authPanel">
+      <div class="authCard">
+        <div class="authHeading">INICIAR SESIÓN</div>
 
-  <div class="card card-pad">
-    <h2 class="h2">Iniciar sesión</h2>
-    <p class="muted">Accede con tu correo y contraseña.</p>
+        <form id="loginForm" class="authForm">
+          <div class="authField">
+            <label for="correo">Email Address</label>
+            <input id="correo" type="email" placeholder="Email Address" required />
+          </div>
 
-    <div style="height:18px"></div>
+          <div class="authField">
+            <label for="password">Password</label>
+            <input id="password" type="password" placeholder="Password" required />
+            <div class="authHint">It must be a combination of minimum 8 letters, numbers, and symbols.</div>
+          </div>
 
-    <form id="loginForm" class="stack">
-      <div class="field">
-        <div class="label">Correo</div>
-        <input class="input" type="email" id="correo" placeholder="correo@ejemplo.com" required>
+          <div class="authRow">
+            <label class="authCheck">
+              <input type="checkbox" />
+              <span>Remember me</span>
+            </label>
+
+            <a class="authLink" href="#" onclick="return false;">Forgot Password?</a>
+          </div>
+
+          <button class="authSubmit" type="submit">INICIAR SESIÓN</button>
+
+          <div id="authMsg" class="authMsg hide"></div>
+
+          <div class="authSocial">
+            <button type="button" class="authSocialBtn" disabled title="No disponible en esta práctica">
+              G &nbsp; Log in with Google
+            </button>
+            <button type="button" class="authSocialBtn" disabled title="No disponible en esta práctica">
+               &nbsp; Log in with Apple
+            </button>
+          </div>
+
+          <a class="authBottomLink" href="/register">No account yet? Sign Up</a>
+        </form>
       </div>
+    </div>
 
-      <div class="field">
-        <div class="label">Contraseña</div>
-        <input class="input" type="password" id="password" placeholder="••••••••" required>
+    <aside class="authHero" aria-hidden="true">
+      <div class="authHeroText">
+        Lo mejor<br/>para tu<br/>mejor amigo
       </div>
-
-      <button class="btn btn-primary" type="submit">Entrar</button>
-      <a class="btn btn-ghost" href="/register">No tengo cuenta</a>
-    </form>
+      <div class="authHeroDog"></div>
+      <div class="authHeroWaves"></div>
+    </aside>
   </div>
 </section>
-
-<script src="/js/auth.js"></script>

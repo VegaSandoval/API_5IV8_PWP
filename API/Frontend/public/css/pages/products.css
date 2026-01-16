@@ -87,19 +87,26 @@
   min-height: 450px;
 }
 
-.productCard__media{
+/* ✅ wrapper que RECORTA el botón con el mismo radio */
+.productCard__mediaWrap{
   position: relative;
   height: 374px;
   border-radius: 40px;
   overflow: hidden;
+}
 
-  /* ✅ ahora sí respeta el color del JS */
+/* media ahora vive dentro del wrap */
+.productCard__media{
+  position: relative;
+  height: 100%;
+  border-radius: 0;        /* el radio lo controla el wrap */
+  overflow: hidden;
+
   background: var(--bg, #D9D9D9);
 
   display: block;
   text-decoration: none;
 }
-
 
 .productCard__media img{
   width: 100%;
@@ -120,32 +127,45 @@
   pointer-events: none;
 }
 
-/* ✅ solo aparece cuando no hay imagen */
 .productCard__media.is-missing .productCard__ghost{
   opacity: 1;
 }
 
-
-.productCard__fav{
+/* =========================
+   ✅ BOTÓN "Agregar al carrito"
+   (hover, sin salirse, dentro del contenedor)
+   ========================= */
+.productCard__addBtn{
   position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 40px;
-  height: 40px;
-  border-radius: 100px;
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+
+  height: 42px;
   border: 0;
-  background: rgba(18,18,18,.2);
-  display: grid;
-  place-items: center;
+  border-radius: 14px;
+
+  background: rgba(0,0,0,.86);
+  color: #fff;
+
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: .5px;
   cursor: pointer;
+
+  transform: translateY(140%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform .18s ease, opacity .18s ease;
 }
 
-.productCard__fav svg{
-  width: 22px;
-  height: 22px;
-  fill: none;
-  stroke: #FFFFFF;
-  stroke-width: 2;
+/* aparece al hover del wrap o focus dentro (teclado) */
+.productCard__mediaWrap:hover .productCard__addBtn,
+.productCard__mediaWrap:focus-within .productCard__addBtn{
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .productCard__name{
@@ -305,6 +325,10 @@
 
 @media (max-width: 640px){
   .span-3{ grid-column: span 12; }
-  .productCard__media{ height: 320px; border-radius: 28px; }
-}
 
+  /* ✅ también ajusta el wrap en mobile */
+  .productCard__mediaWrap{
+    height: 320px;
+    border-radius: 28px;
+  }
+}

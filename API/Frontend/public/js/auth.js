@@ -3,9 +3,9 @@ const API_BASE = "/api";
 function showMsg(text, type = "ok") {
   const box = document.getElementById("authMsg");
   if (!box) return;
-  box.className = `notice ${type}`;
+  box.classList.remove("hide");
+  box.className = `authMsg authMsg--${type}`;
   box.textContent = text;
-  box.style.display = "";
 }
 
 // ============================================
@@ -28,26 +28,20 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
       body: JSON.stringify({ correo, password }),
     });
 
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
 
     if (!res.ok) {
       return showMsg(data?.msg || "No se pudo iniciar sesión.", "err");
     }
 
-    // Guardar AMBOS tokens
     if (data.accessToken && data.refreshToken) {
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken);
-      
-      // Guardar info del usuario (opcional)
-      if (data.usuario) {
-        localStorage.setItem("user", JSON.stringify(data.usuario));
-      }
+
+      if (data.usuario) localStorage.setItem("user", JSON.stringify(data.usuario));
 
       showMsg("Iniciando sesión...", "ok");
-      setTimeout(() => {
-        window.location.href = "/products";
-      }, 500);
+      setTimeout(() => (window.location.href = "/products"), 400);
       return;
     }
 
@@ -64,7 +58,7 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
 document.getElementById("registerForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const nombre = document.getElementById("nombre").value.trim();
+  const nombre = document.getElementById("nombre")?.value.trim();
   const telefono = document.getElementById("telefono")?.value.trim() || "";
   const correo = document.getElementById("correo").value.trim();
   const password = document.getElementById("password").value;
@@ -80,32 +74,24 @@ document.getElementById("registerForm")?.addEventListener("submit", async (e) =>
       body: JSON.stringify({ nombre, correo, password, telefono }),
     });
 
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
 
     if (!res.ok) {
       return showMsg(data?.msg || "No se pudo registrar.", "err");
     }
 
-    // El backend ya devuelve tokens al registrar, podemos logear automáticamente
     if (data.accessToken && data.refreshToken) {
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken);
-      
-      if (data.usuario) {
-        localStorage.setItem("user", JSON.stringify(data.usuario));
-      }
+      if (data.usuario) localStorage.setItem("user", JSON.stringify(data.usuario));
 
       showMsg("¡Cuenta creada! Redirigiendo...", "ok");
-      setTimeout(() => {
-        window.location.href = "/products";
-      }, 700);
-    } else {
-      // Fallback: redirigir a login
-      showMsg("Cuenta creada. Inicia sesión.", "ok");
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 700);
+      setTimeout(() => (window.location.href = "/products"), 600);
+      return;
     }
+
+    showMsg("Cuenta creada. Inicia sesión.", "ok");
+    setTimeout(() => (window.location.href = "/login"), 600);
   } catch (err) {
     console.error("Error en register:", err);
     showMsg("Error de red. Verifica tu conexión.", "err");

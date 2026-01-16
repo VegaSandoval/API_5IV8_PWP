@@ -1,27 +1,23 @@
-<section class="stack">
-  <h1 class="h1">Carrito</h1>
+<section class="cartPage">
+  <div class="cartPageHead">
+    <h1 class="cartPageTitle">Carrito</h1>
+    <button class="pillBtn pillBtn--outline" id="cartPageClearBtn" type="button">Vaciar carrito</button>
+  </div>
 
-  <div class="cart-layout">
-    <div class="card card-pad">
-      <div class="stack" id="cartItems"></div>
-    </div>
+  <div class="cartPageGrid">
+    <div class="cartPageList" id="cartPageList"></div>
 
-    <div class="card card-pad">
-      <h2 class="h2">Resumen</h2>
-      <p class="muted">Revisa tu pedido antes de comprar.</p>
-
-      <div style="height:18px"></div>
-
-      <p id="cartTotal" class="h3"></p>
-
-      <div style="height:18px"></div>
-
-      <div class="row" style="justify-content:space-between; flex-wrap:wrap;">
-        <button class="btn btn-ghost" id="btnEmpty" type="button">Vaciar</button>
-        <button class="btn btn-primary" id="btnBuy" type="button">Comprar</button>
+    <aside class="cartSummary">
+      <div class="cartSumRow">
+        <span>Subtotal</span>
+        <strong id="cartPageSubtotal">$0.00</strong>
       </div>
-    </div>
+
+      <a class="pillBtn" href="/products">Seguir comprando</a>
+      <div style="height:10px"></div>
+      <button class="pillBtn pillBtn--outline" type="button" onclick="alert('Checkout no implementado en esta práctica')">
+        Comprar
+      </button>
+    </aside>
   </div>
 </section>
-
-<script src="/js/cart.js"></script>

@@ -1,225 +1,204 @@
-const API = "/api";
+const CART_LS = "cartItems";
 
-function authHeaders() {
-  const token = localStorage.getItem("accessToken");
-  return token ? { Authorization: `Bearer ${token}` } : {};
+function moneyMXN(n) {
+  const num = Number(n || 0);
+  return num.toLocaleString("es-MX", { style: "currency", currency: "MXN" });
 }
 
-function money(n) {
-  const x = Number(n || 0);
-  return x.toLocaleString("es-MX", { style: "currency", currency: "MXN" });
+function loadCart() {
+  return JSON.parse(localStorage.getItem(CART_LS) || "[]");
+}
+function saveCart(items) {
+  localStorage.setItem(CART_LS, JSON.stringify(items));
+  updateBadge();
 }
 
-function colorMap(nombre) {
-  const v = String(nombre || "").toUpperCase();
-  if (v.includes("ROJO")) return "#d98282";
-  if (v.includes("VERDE LIM")) return "#b8d36a";
-  if (v.includes("AZUL MAR")) return "#45617d";
-  if (v.includes("AZUL CIE")) return "#82bfd1";
-  if (v.includes("MORADO")) return "#b79bd8";
-  if (v.includes("ROSA")) return "#f2a2bd";
-  if (v.includes("AMARIL")) return "#f5d66e";
-  if (v.includes("OSCURO")) return "#4a4e3d";
-  return "#c4d2df";
+function cartCount(items = loadCart()) {
+  return items.reduce((acc, it) => acc + Number(it.qty || 0), 0);
 }
 
-async function fetchJSON(url, opts = {}) {
-  const res = await fetch(url, opts);
-  const data = await res.json().catch(() => ({}));
-
-  // Manejar token expirado
-  if (res.status === 401) {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("user");
-    window.location.href = "/login";
-    throw new Error("Sesión expirada");
-  }
-
-  if (!res.ok) {
-    throw new Error(data?.msg || "Error en la petición");
-  }
-
-  return data;
+function cartSubtotal(items = loadCart()) {
+  return items.reduce((acc, it) => acc + Number(it.qty || 0) * Number(it.precio || 0), 0);
 }
 
-async function loadCart() {
-  const token = localStorage.getItem("accessToken");
-  if (!token) {
-    window.location.href = "/login";
+/* Drawer elements */
+const drawer = document.getElementById("cartDrawer");
+const overlay = document.getElementById("drawerOverlay");
+const btnOpen = document.getElementById("openCartBtn");
+const btnClose = document.getElementById("closeCartBtn");
+
+function openDrawer() {
+  if (!drawer || !overlay) return;
+  overlay.hidden = false;
+  drawer.classList.add("is-open");
+  drawer.setAttribute("aria-hidden", "false");
+  renderDrawer();
+}
+
+function closeDrawer() {
+  if (!drawer || !overlay) return;
+  overlay.hidden = true;
+  drawer.classList.remove("is-open");
+  drawer.setAttribute("aria-hidden", "true");
+}
+
+btnOpen?.addEventListener("click", () => openDrawer());
+btnClose?.addEventListener("click", () => closeDrawer());
+overlay?.addEventListener("click", () => closeDrawer());
+
+/* Badge */
+function updateBadge() {
+  const badge = document.getElementById("cartBadge");
+  if (!badge) return;
+  const count = cartCount();
+  badge.textContent = String(count);
+  badge.classList.toggle("hide", count <= 0);
+}
+
+/* Render drawer */
+function renderDrawer() {
+  const itemsEl = document.getElementById("cartDrawerItems");
+  const subEl = document.getElementById("cartDrawerSubtotal");
+  if (!itemsEl || !subEl) return;
+
+  const items = loadCart();
+  subEl.textContent = moneyMXN(cartSubtotal(items));
+
+  if (!items.length) {
+    itemsEl.innerHTML = `<div class="cartEmpty">Tu carrito está vacío.</div>`;
     return;
   }
 
-  try {
-    const data = await fetchJSON(`${API}/carrito`, {
-      headers: authHeaders()
-    });
+  itemsEl.innerHTML = items.map((it) => `
+    <div class="cartRowItem" data-id="${it.id}">
+      <div class="cartThumb" style="background-image:url('${it.imagen || ""}')"></div>
 
-    // ✅ actualizar badge del navbar (mini-carrito)
-    try {
-      const count = (data.items || []).reduce((acc, it) => acc + Number(it.cantidad || 0), 0);
-      window.dispatchEvent(new CustomEvent("cart:changed", { detail: { count } }));
-    } catch (_) {}
+      <div class="cartInfo">
+        <div class="cartName">${it.nombre || "Producto"}</div>
+        <div class="cartPrice">${it.qty} <span class="x">x</span> <span class="p">${moneyMXN(it.precio)}</span></div>
 
-    const container = document.getElementById("cartItems");
-    const totalEl = document.getElementById("cartTotal");
-
-    if (!container || !totalEl) return;
-
-    container.innerHTML = "";
-
-    if (!data.items || data.items.length === 0) {
-      container.innerHTML = `
-        <div class="card card-pad-sm">
-          <p class="muted">Tu carrito está vacío.</p>
-          <a href="/products" class="btn btn-primary" style="margin-top: 12px;">Ver productos</a>
+        <div class="cartQty">
+          <button class="qtyBtn" data-act="minus" type="button">−</button>
+          <div class="qtyVal">${it.qty}</div>
+          <button class="qtyBtn" data-act="plus" type="button">+</button>
         </div>
-      `;
-      totalEl.textContent = "Total: $0.00";
-      return;
-    }
+      </div>
 
-    data.items.forEach(item => {
-      const c = colorMap(item.color || "");
-      const stockSuficiente = item.stock_suficiente !== false;
-
-      container.innerHTML += `
-        <div class="cart-item ${!stockSuficiente ? 'out-of-stock' : ''}">
-          <div class="cart-thumb" style="--p-color:${c}"></div>
-          <div class="cart-meta">
-            <div class="name">${item.nombre}</div>
-            <div class="sub">
-              ${money(item.precio)} · Subtotal: ${money(item.subtotal)}
-              ${!stockSuficiente ? '<br><span style="color: var(--danger); font-weight: 700;">⚠️ Sin stock suficiente</span>' : ''}
-            </div>
-          </div>
-          <div class="cart-right">
-            <div class="stepper" data-stepper="${item.id}">
-              <button type="button" data-dec>-</button>
-              <input value="${item.cantidad}" readonly />
-              <button type="button" data-inc>+</button>
-            </div>
-            <span class="link-danger" data-remove="${item.id}">Quitar</span>
-          </div>
-        </div>
-      `;
-    });
-
-    totalEl.textContent = `Total: ${money(data.total || 0)}`;
-
-    const btnBuy = document.getElementById("btnBuy");
-    if (btnBuy && data.productos_sin_stock > 0) {
-      btnBuy.disabled = true;
-      btnBuy.textContent = "Productos sin stock";
-      btnBuy.style.opacity = "0.5";
-    } else if (btnBuy) {
-      btnBuy.disabled = false;
-      btnBuy.textContent = "Comprar";
-      btnBuy.style.opacity = "1";
-    }
-
-  } catch (err) {
-    console.error("Error al cargar carrito:", err);
-  }
+      <button class="cartRemove" title="Quitar" data-act="remove" type="button">✕</button>
+    </div>
+  `).join("");
 }
 
-// ============================================
-// EVENT LISTENERS
-// ============================================
+/* Drawer actions */
+document.getElementById("cartDrawerClearBtn")?.addEventListener("click", () => {
+  saveCart([]);
+  renderDrawer();
+  renderCartPage();
+});
 
+/* Event delegation qty/remove */
+document.addEventListener("click", (e) => {
+  const row = e.target.closest(".cartRowItem");
+  if (!row) return;
+
+  const id = row.getAttribute("data-id");
+  const act = e.target.getAttribute("data-act");
+  if (!id || !act) return;
+
+  const items = loadCart();
+  const idx = items.findIndex((x) => String(x.id) === String(id));
+  if (idx < 0) return;
+
+  if (act === "plus") items[idx].qty = Number(items[idx].qty || 0) + 1;
+  if (act === "minus") items[idx].qty = Math.max(1, Number(items[idx].qty || 0) - 1);
+  if (act === "remove") items.splice(idx, 1);
+
+  saveCart(items);
+  renderDrawer();
+  renderCartPage();
+});
+
+/* Add to cart (GLOBAL) - funciona si tu botón tiene class .js-add-cart */
 document.addEventListener("click", async (e) => {
-  // Eliminar item
-  const rm = e.target.closest("[data-remove]");
-  if (rm) {
-    const itemId = rm.getAttribute("data-remove");
+  const btn = e.target.closest(".js-add-cart");
+  if (!btn) return;
+
+  const id = btn.getAttribute("data-id");
+  if (!id) return;
+
+  const nombre = btn.getAttribute("data-name");
+  const precio = btn.getAttribute("data-price");
+  const imagen = btn.getAttribute("data-img");
+
+  // si viene info del botón, la usamos; si no, intentamos pedirla al API
+  let prod = null;
+
+  if (nombre && precio) {
+    prod = { id, nombre, precio: Number(precio), imagen: imagen || "" };
+  } else {
     try {
-      await fetchJSON(`${API}/carrito/item/${itemId}`, {
-        method: "DELETE",
-        headers: authHeaders()
-      });
-      await loadCart();
-    } catch (err) {
-      alert(err.message || "No se pudo eliminar el producto");
+      const res = await fetch(`/api/productos/${id}`);
+      const data = await res.json().catch(() => ({}));
+      const p = data.producto || data || {};
+      prod = {
+        id: p.id || id,
+        nombre: p.nombre || "Producto",
+        precio: Number(p.precio || 0),
+        imagen: p.imagen || "",
+      };
+    } catch {
+      prod = { id, nombre: "Producto", precio: 0, imagen: "" };
     }
+  }
+
+  const items = loadCart();
+  const found = items.find((x) => String(x.id) === String(prod.id));
+  if (found) found.qty += 1;
+  else items.push({ ...prod, qty: 1 });
+
+  saveCart(items);
+  openDrawer();
+});
+
+/* Cart page ( /cart ) */
+function renderCartPage() {
+  const list = document.getElementById("cartPageList");
+  const sub = document.getElementById("cartPageSubtotal");
+  if (!list || !sub) return;
+
+  const items = loadCart();
+  sub.textContent = moneyMXN(cartSubtotal(items));
+
+  if (!items.length) {
+    list.innerHTML = `<div class="cartEmpty">Tu carrito está vacío.</div>`;
     return;
   }
 
-  // Actualizar cantidad
-  const step = e.target.closest("[data-stepper]");
-  if (!step) return;
+  list.innerHTML = items.map((it) => `
+    <div class="cartPageItem" data-id="${it.id}">
+      <div class="cartThumb cartThumb--big" style="background-image:url('${it.imagen || ""}')"></div>
+      <div class="cartInfo">
+        <div class="cartName">${it.nombre || "Producto"}</div>
+        <div class="cartPrice">${moneyMXN(it.precio)} · ${it.qty} unidad(es)</div>
+        <div class="cartQty">
+          <button class="qtyBtn" data-act="minus" type="button">−</button>
+          <div class="qtyVal">${it.qty}</div>
+          <button class="qtyBtn" data-act="plus" type="button">+</button>
+          <button class="pillBtn pillBtn--outline cartRemoveLine" data-act="remove" type="button">Quitar producto</button>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
 
-  const itemId = step.getAttribute("data-stepper");
-  const inp = step.querySelector("input");
-  let v = Number(inp.value || 1);
-
-  if (e.target.matches("[data-dec]")) v = Math.max(1, v - 1);
-  if (e.target.matches("[data-inc]")) v = Math.min(999, v + 1);
-
-  inp.value = String(v);
-
-  try {
-    await fetchJSON(`${API}/carrito/item/${itemId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", ...authHeaders() },
-      body: JSON.stringify({ cantidad: v })
-    });
-    await loadCart();
-  } catch (err) {
-    alert(err.message || "No se pudo actualizar la cantidad");
-    await loadCart();
-  }
+document.getElementById("cartPageClearBtn")?.addEventListener("click", () => {
+  saveCart([]);
+  renderDrawer();
+  renderCartPage();
 });
 
-// Vaciar carrito
-document.getElementById("btnEmpty")?.addEventListener("click", async () => {
-  if (!confirm("¿Seguro que deseas vaciar tu carrito?")) return;
-
-  try {
-    await fetchJSON(`${API}/carrito/vaciar`, {
-      method: "DELETE",
-      headers: authHeaders()
-    });
-    await loadCart();
-  } catch (err) {
-    alert(err.message || "No se pudo vaciar el carrito");
-  }
-});
-
-// Comprar
-document.getElementById("btnBuy")?.addEventListener("click", async () => {
-  const metodo = prompt(
-    "Selecciona método de pago:\n1 = Efectivo\n2 = Tarjeta\n3 = Transferencia\n4 = PayPal",
-    "2"
-  );
-
-  const metodos = {
-    "1": "efectivo",
-    "2": "tarjeta",
-    "3": "transferencia",
-    "4": "paypal"
-  };
-
-  const metodo_pago = metodos[metodo];
-
-  if (!metodo_pago) {
-    alert("Método de pago no válido");
-    return;
-  }
-
-  try {
-    const result = await fetchJSON(`${API}/venta/confirmar`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...authHeaders() },
-      body: JSON.stringify({ metodo_pago })
-    });
-
-    alert(`✅ ${result.msg || 'Compra realizada con éxito'}\n\nTotal: ${money(result.venta?.total || 0)}\nMétodo: ${metodo_pago.toUpperCase()}`);
-    await loadCart();
-  } catch (err) {
-    alert(err.message || "No se pudo completar la compra");
-  }
-});
-
-loadCart().catch(() => {
-  console.error("Error inicial al cargar carrito");
+document.addEventListener("DOMContentLoaded", () => {
+  updateBadge();
+  renderDrawer();
+  renderCartPage();
 });

@@ -104,16 +104,13 @@ function dotColor(name) {
   let raw = String(name || "").trim();
   if (!raw) return "#BFC5AD";
 
-  // quitar acentos para que "CAFÉ" funcione como "CAFE"
   const n = raw
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toUpperCase();
 
-  // si ya viene en HEX, úsalo directo
   if (/^#([0-9A-F]{3}|[0-9A-F]{6})$/i.test(raw)) return raw;
 
-  // mapeos principales (tu estilo Figma)
   if (n.includes("ROJO")) return "#E25F5F";
   if (n.includes("ROSA")) return "#F44E8A";
   if (n.includes("MORAD")) return "#B54EF4";
@@ -125,20 +122,17 @@ function dotColor(name) {
   if (n.includes("VERDE") && (n.includes("LIM") || n.includes("LIMA"))) return "#B8E25F";
   if (n.includes("VERDE")) return "#44936D";
 
-  // ✅ extras que te faltan
   if (n.includes("BLANCO")) return "#F5F5F5";
   if (n.includes("GRIS") || n.includes("GRAY")) return "#B9B9B9";
   if (n.includes("NEGRO") || n.includes("BLACK")) return "#121212";
   if (n.includes("CAFE") || n.includes("MARRON") || n.includes("BROWN")) return "#84553C";
   if (n.includes("BEIGE") || n.includes("CREMA") || n.includes("CREAM")) return "#EAD8CD";
 
-  // ✅ cualquier color desconocido -> color consistente por hash (para que "sea un color" siempre)
   let h = 0;
   for (let i = 0; i < n.length; i++) h = (h * 31 + n.charCodeAt(i)) >>> 0;
   const hue = h % 360;
   return `hsl(${hue} 35% 70%)`;
 }
-
 
 function renderColorChips(colores) {
   const chipsEl = document.getElementById("colorChips");
@@ -183,25 +177,24 @@ function normalizeProduct(p) {
     nombre: p.nombre ?? p.name ?? "Producto",
     precio: Number(p.precio ?? 0),
     imagen: p.imagen ?? p.image ?? "",
-    color: p.color ?? p.colour ?? "", // para el fondo cuando no hay imagen
+    color: p.color ?? p.colour ?? "",
   };
 }
 
 function mediaBg(p, index) {
-  // si el producto trae color -> úsalo SIEMPRE
   if (p?.color) return dotColor(p.color);
-
-  // si no trae color -> paleta tipo figma
   const palette = ["#BFC5AD", "#8BA0B5", "#D9AD8D", "#4A4E3D", "#F3D9C8", "#45617D"];
   return palette[index % palette.length];
 }
 
-
 function productCardHTML(pRaw, index) {
   const p = normalizeProduct(pRaw);
-  const id = encodeURIComponent(p.id);
+
+  const idForLink = encodeURIComponent(p.id);
+  const idRaw = escapeHTML(p.id);
+
   const name = escapeHTML(p.nombre);
-  const price = isFinite(p.precio) ? `$${p.precio.toFixed(2)}` : "$0.00";
+  const priceText = isFinite(p.precio) ? `$${p.precio.toFixed(2)}` : "$0.00";
 
   // Layout tipo Figma: 3-3-6 / 6-3-3
   const spans = ["span-3", "span-3", "span-6", "span-6", "span-3", "span-3"];
@@ -213,33 +206,36 @@ function productCardHTML(pRaw, index) {
 
   return `
     <article class="productCard ${spanClass}">
-      <a class="productCard__media ${missingClass}" href="/products/${id}" style="--bg:${escapeHTML(bg)}">
-        ${
-          img
-            ? `<img src="${img}" alt="${name}" loading="lazy" decoding="async"
-                 onerror="this.remove(); this.parentElement.classList.add('is-missing');">`
-            : ``
-        }
-        <span class="productCard__ghost">Sin imagen</span>
-      </a>
+      <div class="productCard__mediaWrap">
+        <a class="productCard__media ${missingClass}" href="/products/${idForLink}" style="--bg:${escapeHTML(bg)}">
+          ${
+            img
+              ? `<img src="${img}" alt="${name}" loading="lazy" decoding="async"
+                   onerror="this.remove(); this.parentElement.classList.add('is-missing');">`
+              : ``
+          }
+          <span class="productCard__ghost">Sin imagen</span>
+        </a>
+
+        <!-- ✅ compatible con cart.js global -->
+        <button
+          class="productCard__addBtn js-add-cart"
+          type="button"
+          data-id="${idRaw}"
+          data-name="${name}"
+          data-price="${escapeHTML(String(Number(p.precio || 0)))}"
+          data-img="${img}">
+          Agregar al carrito
+        </button>
+      </div>
 
       <div>
         <div class="productCard__name">${name}</div>
-        <div class="productCard__price">${escapeHTML(price)}</div>
-      </div>
-
-      <!-- ✅ aparece al hover, dentro del card -->
-      <div class="productCard__addWrap">
-        <button class="btn btn-ghost btn-sm productCard__addBtn"
-                type="button"
-                data-add-cart="${escapeHTML(p.id)}">
-          Agregar al carrito
-        </button>
+        <div class="productCard__price">${escapeHTML(priceText)}</div>
       </div>
     </article>
   `;
 }
-
 
 function renderProducts() {
   const mount = document.getElementById("productsMount");
@@ -247,7 +243,6 @@ function renderProducts() {
 
   const slice = state.all.slice(0, state.visible);
 
-  // ✅ Mensaje EXACTO cuando no hay productos (por categoría o filtros)
   if (slice.length === 0) {
     mount.innerHTML = `
       <div class="products-empty">
@@ -263,6 +258,7 @@ function renderProducts() {
 }
 
 function bindInteractions() {
+  // Categorías + colores
   document.addEventListener("click", (e) => {
     const catBtn = e.target.closest("[data-cat]");
     if (catBtn) {
@@ -282,11 +278,23 @@ function bindInteractions() {
     }
   });
 
+  // Ver más
   const btnMore = document.getElementById("btnMore");
   if (btnMore) {
     btnMore.addEventListener("click", () => {
       state.visible = Math.min(state.visible + 6, state.all.length);
       renderProducts();
+    });
+  }
+
+  // Search del navbar -> q
+  const navSearch = document.getElementById("navSearch");
+  if (navSearch) {
+    navSearch.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter") return;
+      const q = navSearch.value.trim();
+      setQS({ categoria: state.categoria || "", color: state.color || "", q });
+      refresh();
     });
   }
 
@@ -296,6 +304,10 @@ function bindInteractions() {
 async function refresh() {
   readStateFromURL();
   renderTitle();
+
+  // set search input
+  const navSearch = document.getElementById("navSearch");
+  if (navSearch) navSearch.value = state.q || "";
 
   const meta = await getMeta();
   renderCategoryStrip(meta.categorias);

@@ -56,27 +56,68 @@ app.get("/", (req, res) =>
   })
 );
 
-// ✅ IMPORTANTE: para que funcione el filtro desde Home
 app.get("/products", (req, res) =>
   renderWithLayout(res, "pages/products", {
     title: "Productos",
-    pageCss: "/css/pages/products.css",   // si no existe, borra esta línea
+    pageCss: "/css/pages/products.css",
     pageJs: "/js/products.js",
   })
 );
 
 app.get("/products/:id", (req, res) =>
-  renderWithLayout(res, "pages/product-detail", { title: "Detalle de producto" })
+  renderWithLayout(res, "pages/product-detail", {
+    title: "Detalle de producto",
+    pageJs: "/js/product-detail.js",
+  })
 );
 
-app.get("/cart", (req, res) => renderWithLayout(res, "pages/cart", { title: "Carrito" }));
-app.get("/profile", (req, res) => renderWithLayout(res, "pages/profile", { title: "Mi cuenta" }));
-app.get("/login", (req, res) => renderWithLayout(res, "pages/login", { title: "Iniciar sesión" }));
-app.get("/register", (req, res) => renderWithLayout(res, "pages/register", { title: "Registrarse" }));
-app.get("/contact", (req, res) => renderWithLayout(res, "pages/contact", { title: "Contacto" }));
+app.get("/cart", (req, res) =>
+  renderWithLayout(res, "pages/cart", {
+    title: "Carrito",
+    pageCss: "/css/pages/cart.css",
+    // cart.js ya va global desde el layout
+  })
+);
+
+app.get("/profile", (req, res) =>
+  renderWithLayout(res, "pages/profile", {
+    title: "Mi cuenta",
+    pageCss: "/css/pages/profile.css",
+    pageJs: "/js/profile.js",
+  })
+);
+
+app.get("/login", (req, res) =>
+  renderWithLayout(res, "pages/login", {
+    title: "Iniciar sesión",
+    pageCss: "/css/pages/auth.css",
+    pageJs: "/js/auth.js",
+  })
+);
+
+app.get("/register", (req, res) =>
+  renderWithLayout(res, "pages/register", {
+    title: "Registrarse",
+    pageCss: "/css/pages/auth.css",
+    pageJs: "/js/auth.js",
+  })
+);
+
+app.get("/contact", (req, res) =>
+  renderWithLayout(res, "pages/contact", { title: "Contacto" })
+);
+
+app.get("/about", (req, res) =>
+  renderWithLayout(res, "pages/about", { title: "Sobre nosotros" })
+);
 
 // Admin view
-app.get("/admin", (req, res) => renderWithLayout(res, "pages/admin", { title: "Admin Panel" }));
+app.get("/admin", (req, res) =>
+  renderWithLayout(res, "pages/admin", {
+    title: "Admin Panel",
+    pageJs: "/js/admin.js",
+  })
+);
 
 // 404
 app.use((req, res) => {

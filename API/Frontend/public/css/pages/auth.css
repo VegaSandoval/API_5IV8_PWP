@@ -1,0 +1,198 @@
+.authPage{
+  padding: 26px 0 64px;
+}
+
+.authGrid{
+  display:grid;
+  grid-template-columns: 1fr 546px;
+  gap: 28px;
+  align-items: stretch;
+  min-height: 760px;
+}
+
+/* LEFT */
+.authPanel{
+  background: #8BA0B5;
+  border-radius: 35px;
+  padding: 24px;
+  display:flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.authCard{
+  width: 100%;
+  max-width: 720px;
+  background: #F5F5F5;
+  border-radius: 35px;
+  padding: 40px 50px 50px;
+}
+
+.authHeading{
+  font-family: Quicksand, Inter, sans-serif;
+  font-size: 60px;
+  line-height: 110%;
+  font-weight: 400;
+  color: #1B2733;
+  margin-bottom: 18px;
+}
+
+.authForm{
+  display:flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.authField label{
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 16px;
+  color: #4D2E1E;
+  display:block;
+  margin-bottom: 6px;
+}
+
+.authField input{
+  width:100%;
+  height: 52px;
+  border: 0;
+  outline: 0;
+  background: #BFC5AD;
+  border-bottom: 1px solid #FFFFFF;
+  padding: 0 16px;
+  border-radius: 10px;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 15px;
+  color: #1B2733;
+}
+
+.authHint{
+  font-size: 12px;
+  color: rgba(77,46,30,.85);
+  margin-top: 6px;
+}
+
+.authRow{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.authCheck{
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  font-size: 14px;
+  color: #4D2E1E;
+}
+
+.authLink{
+  font-size: 14px;
+  color: #0F62FE;
+  text-decoration:none;
+}
+
+.authSubmit{
+  height: 48px;
+  width: 100%;
+  border: 2px solid #000;
+  background:#000;
+  color:#fff;
+  border-radius: 10px;
+  font-family: Poppins, Inter, sans-serif;
+  font-size: 16px;
+  letter-spacing: .5px;
+  cursor:pointer;
+}
+
+.authMsg{
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 14px;
+}
+.authMsg--ok{ background: rgba(40,167,69,.12); border: 1px solid rgba(40,167,69,.25); color: #1b5e2a; }
+.authMsg--err{ background: rgba(214,74,74,.10); border: 1px solid rgba(214,74,74,.25); color: #7a1f1f; }
+
+.authSocial{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 6px;
+}
+
+.authSocialBtn{
+  height: 48px;
+  border: 2px solid #000;
+  border-radius: 15px;
+  background: transparent;
+  font-family: Roboto, Inter, sans-serif;
+  font-size: 14px;
+  cursor:not-allowed;
+  opacity: .7;
+}
+
+.authBottomLink{
+  margin-top: 2px;
+  font-size: 14px;
+  color:#0F62FE;
+  text-decoration:none;
+}
+
+/* RIGHT */
+.authHero{
+  position: relative;
+  background: #BFC5AD; /* fallback si no hay imagen */
+  border-radius: 18px;
+  overflow: hidden;
+  min-height: 760px;
+}
+
+.authHeroText{
+  position:absolute;
+  top: 34px;
+  left: 34px;
+  font-family: Poppins, Inter, sans-serif;
+  font-weight: 600;
+  font-size: 64px;
+  line-height: 80%;
+  letter-spacing: -0.05em;
+  color: #1A1A1A;
+  z-index: 3;
+}
+
+.authHeroDog{
+  position:absolute;
+  right: -80px;
+  bottom: -40px;
+  width: 620px;
+  height: 700px;
+  background:
+    url("/assets/img/perrito_pata-removebg-preview.png") no-repeat center / contain;
+  filter: drop-shadow(60px 10px 80px rgba(0, 0, 0, 0.4));
+  transform: rotate(5deg);
+  z-index: 2;
+}
+
+.authHeroWaves{
+  position:absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: .55;
+  background:
+    radial-gradient(circle at -30% 30%, transparent 0 68%, rgba(230,230,230,.9) 68% 69%, transparent 69% 100%),
+    radial-gradient(circle at -20% 40%, transparent 0 64%, rgba(230,230,230,.9) 64% 65%, transparent 65% 100%),
+    radial-gradient(circle at -40% 20%, transparent 0 72%, rgba(230,230,230,.9) 72% 73%, transparent 73% 100%);
+}
+
+/* Responsive */
+@media (max-width: 1100px){
+  .authGrid{ grid-template-columns: 1fr; }
+  .authHero{ min-height: 420px; }
+  .authHeroDog{ width: 520px; height: 520px; right:-120px; bottom:-80px; }
+}
+@media (max-width: 520px){
+  .authCard{ padding: 28px 22px; }
+  .authHeading{ font-size: 40px; }
+  .authSocial{ grid-template-columns: 1fr; }
+}

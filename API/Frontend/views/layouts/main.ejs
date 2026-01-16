@@ -1,32 +1,62 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title><%= title || 'WebbyFrames' %></title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title><%= title ? `${title} | PETWOOF` : "PETWOOF" %></title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Poppins:wght@400;500;600;700;800&family=Quicksand:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-
-  <link rel="stylesheet" href="/css/app.css">
+  <link rel="stylesheet" href="/css/app.css" />
   <% if (pageCss) { %>
-    <link rel="stylesheet" href="<%= pageCss %>">
+    <link rel="stylesheet" href="<%= pageCss %>" />
   <% } %>
 </head>
 
 <body class="app">
-  <%- include('../partials/navbar') %>
+  <%- include("../partials/navbar") %>
 
   <main class="page">
-    <%- body %>
+    <div class="container">
+      <%- body %>
+    </div>
   </main>
 
-  <%- include('../partials/footer') %>
+  <%- include("../partials/footer") %>
 
-  <script src="/js/ui.js"></script>
+  <!-- Overlay + Drawer del carrito (GLOBAL) -->
+  <div class="drawerOverlay" id="drawerOverlay" hidden></div>
+
+  <aside class="cartDrawer" id="cartDrawer" aria-hidden="true">
+    <div class="cartDrawer__head">
+      <div class="cartDrawer__title">Carrito</div>
+      <button class="cartDrawer__close" id="closeCartBtn" type="button" aria-label="Cerrar">✕</button>
+    </div>
+
+    <div class="cartDrawer__line"></div>
+
+    <div class="cartDrawer__items" id="cartDrawerItems">
+      <!-- items por JS -->
+    </div>
+
+    <div class="cartDrawer__line"></div>
+
+    <div class="cartDrawer__foot">
+      <div class="cartDrawer__subtotal">
+        <span>Subtotal</span>
+        <strong id="cartDrawerSubtotal">$0.00</strong>
+      </div>
+
+      <div class="cartDrawer__actions">
+        <a class="pillBtn" href="/cart">Ir a carrito</a>
+        <button class="pillBtn pillBtn--outline" id="cartDrawerClearBtn" type="button">Vaciar</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- JS global (drawer funciona en todas las páginas) -->
+  <script src="/js/cart.js" defer></script>
+
   <% if (pageJs) { %>
-    <script src="<%= pageJs %>"></script>
+    <script src="<%= pageJs %>" defer></script>
   <% } %>
 </body>
 </html>

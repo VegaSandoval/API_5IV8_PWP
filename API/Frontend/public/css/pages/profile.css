@@ -1,0 +1,376 @@
+.profilePage{ padding: 20px 0 60px; }
+
+/* Top grid */
+.profileTop{
+  display:grid;
+  grid-template-columns: 1fr 440px;
+  gap: 16px;
+}
+
+/* Cards */
+.profileCard{
+  border-radius: 35px;
+  position: relative;
+  overflow: hidden;
+}
+
+.profileCard--account{
+  background: #F3D9C8;
+  padding: 28px 28px 24px;
+  min-height: 587px;
+}
+
+.profileCard--pay{
+  background: #45617D;
+  padding: 28px 28px 24px;
+  min-height: 587px;
+  color: #fff;
+  display:flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.profileCard--ship{
+  margin-top: 16px;
+  background: #D9AD8D;
+  padding: 28px;
+  min-height: 311px;
+}
+
+.profileTitle{
+  font-family: Quicksand, Inter, sans-serif;
+  font-weight: 400;
+  font-size: 40px;
+  letter-spacing: -0.3px;
+  color: #000;
+  margin: 10px 0 18px;
+}
+
+.profileTitle--white{ color: #fff; }
+.profileTitle--dark{ color: #1B2733; }
+
+/* Account layout */
+.profileAccountGrid{
+  display:grid;
+  grid-template-columns: 300px 1fr;
+  gap: 26px;
+  align-items: start;
+}
+
+.profileAvatar{
+  width: 245px;
+  height: 235px;
+  border-radius: 999px;
+  background: #4A4E3D;
+  margin-top: 10px;
+}
+
+.profileData{
+  display:flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-top: 6px;
+}
+
+.profileLabel{
+  font-family: Poppins, Inter, sans-serif;
+  font-size: 30px;
+  line-height: 1.1;
+  letter-spacing: -1px;
+  color: #4D2E1E;
+}
+.profileValue{
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 20px;
+  color: #4D2E1E;
+  opacity: .85;
+  margin-top: 4px;
+}
+
+.profileInline2{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.profileBtns{
+  grid-column: 1 / -1;
+  display:flex;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.btnPill{
+  height: 50px;
+  border: 0;
+  border-radius: 200px;
+  padding: 0 22px;
+  font-family: Inter, system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: 1px;
+  cursor:pointer;
+}
+.btnPill--brown{ background:#84553C; color:#fff; }
+.btnPill--navy{ background:#1B2733; color:#fff; }
+.btnPill--white{
+  background:#fff;
+  color:#45617D;
+}
+
+/* Pay list */
+.payList{
+  display:flex;
+  flex-direction: column;
+  gap: 18px;
+  flex: 1;
+}
+.payItem{ padding: 0; }
+.payLabel{
+  font-family: Poppins, Inter, sans-serif;
+  font-size: 30px;
+  line-height: 1.1;
+  letter-spacing: -1px;
+  color:#fff;
+}
+.payValue{
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 20px;
+  opacity: .85;
+  margin-top: 4px;
+}
+
+/* Shipping */
+.shipGrid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 6px;
+}
+
+.shipLabel{
+  font-family: Poppins, Inter, sans-serif;
+  font-size: 30px;
+  letter-spacing: -1px;
+  color:#1B2733;
+}
+.shipValue{
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 20px;
+  opacity: .85;
+  margin-top: 4px;
+  color:#1B2733;
+}
+
+.profileActions{
+  display:flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 18px;
+  max-width: 551px;
+}
+
+.btnWideBlack{
+  height: 48px;
+  border: 2px solid #000;
+  background:#000;
+  color:#fff;
+  border-radius: 10px;
+  font-family: Poppins, Inter, sans-serif;
+  letter-spacing: .5px;
+  cursor:pointer;
+}
+
+/* Bottom */
+.profileBottom{
+  display:grid;
+  grid-template-columns: 614px 1fr;
+  gap: 20px;
+  margin-top: 18px;
+}
+
+.promoCard{
+  position:relative;
+  background:#BFC5AD; /* fallback */
+  height: 510px;
+  border-radius: 0;
+  overflow:hidden;
+}
+
+.promoText{
+  position:absolute;
+  top: 40px;
+  right: 26px;
+  font-family: Poppins, Inter, sans-serif;
+  font-weight: 600;
+  font-size: 64px;
+  line-height: 80%;
+  letter-spacing: -0.05em;
+  color:#1A1A1A;
+  z-index: 3;
+  text-align:right;
+}
+
+.promoDog{
+  position:absolute;
+  left: -120px;
+  bottom: -70px;
+  width: 520px;
+  height: 520px;
+  background: url("/assets/img/perrito_pata-removebg-preview.png") no-repeat center / contain;
+  filter: drop-shadow(60px 10px 80px rgba(0,0,0,.4));
+  transform: scaleX(-1) rotate(5deg);
+  z-index: 2;
+}
+
+.promoWaves{
+  position:absolute;
+  inset:0;
+  z-index: 1;
+  opacity:.55;
+  background:
+    radial-gradient(circle at -30% 30%, transparent 0 68%, rgba(230,230,230,.9) 68% 69%, transparent 69% 100%),
+    radial-gradient(circle at -20% 40%, transparent 0 64%, rgba(230,230,230,.9) 64% 65%, transparent 65% 100%),
+    radial-gradient(circle at -40% 20%, transparent 0 72%, rgba(230,230,230,.9) 72% 73%, transparent 73% 100%);
+}
+
+.historyCard{
+  background:#4A4E3D;
+  border-radius: 35px;
+  padding: 28px;
+  color:#fff;
+  min-height: 510px;
+  position:relative;
+  overflow:hidden;
+}
+
+.historyTitle{
+  font-family: Quicksand, Inter, sans-serif;
+  font-size: 40px;
+  letter-spacing: -0.3px;
+  margin: 10px 0 18px;
+}
+
+.historyList{
+  display:flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.historyItem{ padding-left: 6px; }
+.historyProd{
+  font-family: Poppins, Inter, sans-serif;
+  font-size: 30px;
+  letter-spacing: -1px;
+}
+.historyMeta{
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 16px;
+  opacity: .85;
+  margin-top: 6px;
+  line-height: 1.35;
+}
+
+.historyEmpty{
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 16px;
+  opacity: .85;
+}
+
+.historyMore{
+  position:absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  width: 207px;
+  height: 56px;
+  background:#000;
+  color:#fff;
+  border:0;
+  border-radius: 10px;
+  font-family: Poppins, Inter, sans-serif;
+  font-size: 20px;
+  cursor:pointer;
+}
+
+/* Modal */
+.modal{
+  position: fixed;
+  inset: 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: rgba(0,0,0,.35);
+  z-index: 999;
+}
+.modal__box{
+  width: min(720px, calc(100vw - 32px));
+  background:#fff;
+  border-radius: 18px;
+  overflow:hidden;
+}
+.modal__head{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(0,0,0,.08);
+}
+.modal__title{
+  font-family: Inter, system-ui, sans-serif;
+  font-weight: 700;
+}
+.modal__close{
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,.12);
+  background: transparent;
+  cursor:pointer;
+}
+.modal__body{
+  padding: 16px;
+}
+.modal__foot{
+  display:flex;
+  justify-content:flex-end;
+  gap: 10px;
+  padding: 14px 16px;
+  border-top: 1px solid rgba(0,0,0,.08);
+}
+
+.mForm{
+  display:flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mForm h4{
+  margin: 8px 0 0;
+  font-family: Inter, system-ui, sans-serif;
+}
+.mForm label{
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 13px;
+  opacity:.8;
+}
+.mForm input{
+  height: 44px;
+  border: 1px solid rgba(0,0,0,.15);
+  border-radius: 10px;
+  padding: 0 12px;
+  font-family: Inter, system-ui, sans-serif;
+}
+.mHint{
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  opacity:.7;
+  margin-top: 4px;
+}
+
+/* Responsive */
+@media (max-width: 1100px){
+  .profileTop{ grid-template-columns: 1fr; }
+  .profileBottom{ grid-template-columns: 1fr; }
+  .profileAccountGrid{ grid-template-columns: 1fr; }
+  .profileBtns{ flex-direction: column; }
+  .shipGrid{ grid-template-columns: 1fr; }
+}

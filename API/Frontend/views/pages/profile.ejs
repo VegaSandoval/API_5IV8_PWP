@@ -1,107 +1,118 @@
-<section class="stack">
-  <div class="row" style="justify-content: space-between; align-items: center;">
-    <h1 class="h1">Mi cuenta</h1>
-    <div id="rolBadge"></div>
+<section class="profilePage">
+  <div class="profileTop">
+    <!-- INFO CUENTA -->
+    <div class="profileCard profileCard--account">
+      <div class="profileTitle">INFORMACIÓN DE CUENTA</div>
+
+      <div class="profileAccountGrid">
+        <div class="profileAvatar" aria-hidden="true"></div>
+
+        <div class="profileData">
+          <div class="profileItem">
+            <div class="profileLabel">Nombre</div>
+            <div class="profileValue" id="pNombre">—</div>
+          </div>
+
+          <div class="profileItem">
+            <div class="profileLabel">Correo</div>
+            <div class="profileValue" id="pCorreo">—</div>
+          </div>
+
+          <div class="profileItem">
+            <div class="profileLabel">Contacto</div>
+            <div class="profileValue" id="pTelefono">—</div>
+          </div>
+
+          <div class="profileInline2">
+            <div class="profileItem">
+              <div class="profileLabel">Edad</div>
+              <div class="profileValue" id="pEdad">—</div>
+            </div>
+            <div class="profileItem">
+              <div class="profileLabel">Género</div>
+              <div class="profileValue" id="pGenero">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="profileBtns">
+          <button class="btnPill btnPill--brown" id="btnEditProfile" type="button">EDITAR PERFIL</button>
+          <button class="btnPill btnPill--brown" id="btnDeleteAccount" type="button">BORRAR CUENTA</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFO PAGO -->
+    <div class="profileCard profileCard--pay">
+      <div class="profileTitle profileTitle--white">INFORMACIÓN DE PAGO</div>
+
+      <div class="payList" id="payList"></div>
+
+      <button class="btnPill btnPill--white" id="btnEditPayment" type="button">EDITAR METODO</button>
+    </div>
   </div>
-  
-  <div id="profileStats"></div>
 
-  <div class="card card-pad">
-    <h2 class="h2">Información personal</h2>
-    <p class="muted">Actualiza tus datos de perfil.</p>
+  <!-- ENVIO -->
+  <div class="profileCard profileCard--ship">
+    <div class="profileTitle profileTitle--dark">INFORMACIÓN DE ENVIO</div>
 
-    <div style="height:18px"></div>
-
-    <form id="profileForm" class="stack" style="max-width:520px;">
-      <div class="field">
-        <div class="label">Nombre</div>
-        <input class="input" type="text" id="nombre" placeholder="Tu nombre" required>
+    <div class="shipGrid">
+      <div class="shipItem">
+        <div class="shipLabel">PAÍS</div>
+        <div class="shipValue" id="sPais">—</div>
       </div>
 
-      <div class="field">
-        <div class="label">Correo</div>
-        <input class="input" type="email" id="correo" placeholder="correo@ejemplo.com">
+      <div class="shipItem">
+        <div class="shipLabel">ALCALDÍA</div>
+        <div class="shipValue" id="sAlcaldia">—</div>
       </div>
 
-      <div class="field">
-        <div class="label">Teléfono (opcional)</div>
-        <input class="input" type="text" id="telefono" placeholder="55 1234 5678">
+      <div class="shipItem">
+        <div class="shipLabel">CÓDIGO POSTAL</div>
+        <div class="shipValue" id="sCP">—</div>
       </div>
+    </div>
 
-      <button class="btn btn-primary" type="submit">Actualizar perfil</button>
-    </form>
+    <button class="btnPill btnPill--navy" id="btnEditShipping" type="button">EDITAR UBICACIÓN</button>
   </div>
 
-  <div class="card card-pad">
-    <h2 class="h2">Cambiar contraseña</h2>
-    <p class="muted">Actualiza tu contraseña de acceso.</p>
-
-    <div style="height:18px"></div>
-
-    <form id="changePasswordForm" class="stack" style="max-width:520px;">
-      <div class="field">
-        <div class="label">Contraseña actual</div>
-        <input class="input" type="password" id="password_actual" placeholder="••••••••" required>
-      </div>
-
-      <div class="field">
-        <div class="label">Nueva contraseña</div>
-        <input class="input" type="password" id="password_nueva" placeholder="Mínimo 8, con símbolo" required>
-      </div>
-
-      <button class="btn btn-secondary" type="submit">Cambiar contraseña</button>
-    </form>
+  <!-- acciones -->
+  <div class="profileActions">
+    <button class="btnWideBlack" id="btnLogout" type="button">CERRAR SESIÓN</button>
+    <button class="btnWideBlack" id="btnEditAll" type="button">EDITAR TODA LA INFORMACIÓN</button>
   </div>
 
-  <div class="card card-pad" style="border-color: rgba(214, 74, 74, 0.3); background: rgba(214, 74, 74, 0.05);">
-    <h2 class="h2">Zona peligrosa</h2>
-    <p class="muted">Eliminar tu cuenta es permanente.</p>
+  <!-- bottom: promo + historial -->
+  <div class="profileBottom">
+    <div class="promoCard">
+      <div class="promoText">PETWOOF<br/>TU MEJOR<br/>OPCIÓN</div>
+      <div class="promoDog" aria-hidden="true"></div>
+      <div class="promoWaves" aria-hidden="true"></div>
+    </div>
 
-    <div style="height:18px"></div>
+    <div class="historyCard">
+      <div class="historyTitle">HISTORIAL DE COMPRAS</div>
 
-    <button class="btn" style="background: var(--danger); color: #fff;" type="button" onclick="deleteAccount()">
-      Eliminar mi cuenta
-    </button>
+      <div class="historyList" id="historyList"></div>
+
+      <button class="historyMore" id="btnHistoryMore" type="button">Ver Más</button>
+    </div>
+  </div>
+
+  <!-- Modal reutilizable -->
+  <div class="modal hide" id="modal">
+    <div class="modal__box">
+      <div class="modal__head">
+        <div class="modal__title" id="modalTitle">Editar</div>
+        <button class="modal__close" id="modalClose" type="button">✕</button>
+      </div>
+
+      <div class="modal__body" id="modalBody"></div>
+
+      <div class="modal__foot">
+        <button class="pillBtn pillBtn--outline" id="modalCancel" type="button">Cancelar</button>
+        <button class="pillBtn" id="modalSave" type="button">Guardar</button>
+      </div>
+    </div>
   </div>
 </section>
-
-<script>
-  async function deleteAccount() {
-    const password = prompt("Escribe tu contraseña para confirmar:");
-    if (!password) return;
-
-    const confirmacion = prompt('Escribe "ELIMINAR" (en mayúsculas) para confirmar:');
-    if (confirmacion !== "ELIMINAR") {
-      alert("Cancelado");
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem("accessToken");
-      const res = await fetch("/api/user/eliminar-cuenta", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ password, confirmacion })
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        alert(data.msg || "No se pudo eliminar la cuenta");
-        return;
-      }
-
-      alert("✅ Cuenta eliminada correctamente");
-      localStorage.clear();
-      window.location.href = "/";
-
-    } catch (err) {
-      alert("Error al eliminar cuenta");
-    }
-  }
-</script>
-
-<script src="/js/profile.js"></script>

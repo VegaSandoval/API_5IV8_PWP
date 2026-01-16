@@ -1,71 +1,63 @@
-<header>
-  <div class="topbar">
-    <div class="container topbar__inner">
-      <nav class="topbar__links" aria-label="Top links">
-        <a href="#">Tracking Package</a>
-        <a href="#">Sobre Nosotros</a>
-        <a href="#">Contáctanos</a>
-      </nav>
-    </div>
-  </div>
-
-  <div class="nav">
-    <div class="container nav__inner">
-      <a class="nav__logo" href="/">WebbyFrames</a>
-
-      <div class="nav__searchRow">
-        <div class="search" role="search">
-          <input type="search" placeholder="Buscar" aria-label="Buscar" />
-          <svg class="search__icon" viewBox="0 0 24 24" fill="none">
-            <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="2"/>
-            <path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </div>
-
-        <button class="nav__catBtn" type="button">
-          <span>Categorías</span>
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-      </div>
-
-      <div class="nav__icons" aria-label="User actions">
-        <a class="iconBtn" href="/login" aria-label="Usuario">👤</a>
-
-        <!-- ✅ click normal abre drawer, ctrl/cmd click abre /cart -->
-        <a class="iconBtn cartIcon" href="/cart" aria-label="Carrito" data-cart-open>
-          🛒
-          <span class="cartBadge hide" id="cartBadge" aria-label="Items en carrito"></span>
-        </a>
-      </div>
-    </div>
+<header class="topbar">
+  <div class="container topbar__inner">
+    <nav class="topbar__links">
+      <a href="#">Tracking Package</a>
+      <a href="/about">Sobre Nosotros</a>
+      <a href="/contact">Contactanos</a>
+    </nav>
   </div>
 </header>
 
-<!-- ✅ Mini-carrito tipo drawer -->
-<div class="cartDrawer" id="cartDrawer" aria-hidden="true">
-  <div class="cartDrawer__backdrop" data-cart-close></div>
+<nav class="nav">
+  <div class="container nav__inner">
+    <a class="nav__logo" href="/">PETWOOF</a>
 
-  <aside class="cartDrawer__panel" role="dialog" aria-modal="true" aria-label="Carrito">
-    <header class="cartDrawer__head">
-      <div class="cartDrawer__title">Carrito</div>
-      <button class="cartDrawer__close" type="button" aria-label="Cerrar" data-cart-close>✕</button>
-    </header>
+    <div class="nav__searchRow">
+      <div class="search">
+        <input id="navSearch" type="text" placeholder="Buscar" />
+        <svg class="search__icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M10 4a6 6 0 104.472 10.03l3.749 3.75 1.414-1.415-3.75-3.748A6 6 0 0010 4zm0 2a4 4 0 110 8 4 4 0 010-8z"/>
+        </svg>
+      </div>
 
-    <div class="cartDrawer__body" id="cartDrawerBody">
-      <!-- JS render -->
+      <button class="nav__catBtn" type="button">
+        <span>Categorías</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M7 10l5 5 5-5z"/>
+        </svg>
+      </button>
     </div>
 
-    <footer class="cartDrawer__foot">
-      <div class="cartDrawer__subtotal">
-        <span class="muted">Subtotal</span>
-        <strong id="cartDrawerSubtotal">$0.00</strong>
-      </div>
+    <div class="nav__icons">
+      <a class="iconBtn" href="#" aria-label="Favoritos">
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M12 21s-7-4.35-9.5-8.5S3 3 8 3c2.1 0 3.4 1.2 4 2 0.6-0.8 1.9-2 4-2 5 0 8 4 5.5 9.5S12 21 12 21z" opacity=".35"/>
+          <path fill="currentColor" d="M12 21s-7-4.35-9.5-8.5S3 3 8 3c2.1 0 3.4 1.2 4 2 0.6-0.8 1.9-2 4-2 5 0 8 4 5.5 9.5S12 21 12 21z" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+      </a>
 
-      <div class="cartDrawer__cta">
-        <a class="btn btn-primary" href="/cart">Ir a carrito</a>
-      </div>
-    </footer>
-  </aside>
-</div>
+      <a class="iconBtn" id="navUserLink" href="/login" aria-label="Cuenta">
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M12 12a4 4 0 10-4-4 4 4 0 004 4zm0 2c-4.4 0-8 2.24-8 5v1h16v-1c0-2.76-3.6-5-8-5z"/>
+        </svg>
+      </a>
+
+      <button class="iconBtn" id="openCartBtn" type="button" aria-label="Carrito" style="position:relative;">
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M7 18a2 2 0 102 2 2 2 0 00-2-2zm10 0a2 2 0 102 2 2 2 0 00-2-2zM7.2 6l.4 2h11.2l-1.1 6H8.1l-.2-1H19a1 1 0 001-.8l1.3-7.1A1 1 0 0019.3 4H6.3L6 2.6A1 1 0 005 2H3v2h1.2l2 10.4A2 2 0 008.2 16H18v-2H8.2l-.3-1.6h9.9a2 2 0 002-1.6L21 6z"/>
+        </svg>
+
+        <span class="cartBadge hide" id="cartBadge">0</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<script>
+  // Decide link de usuario (login vs profile)
+  (function () {
+    const token = localStorage.getItem("accessToken");
+    const link = document.getElementById("navUserLink");
+    if (link) link.href = token ? "/profile" : "/login";
+  })();
+</script>
