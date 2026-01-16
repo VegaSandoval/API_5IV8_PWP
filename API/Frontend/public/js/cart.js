@@ -118,26 +118,35 @@ document.addEventListener("click", (e) => {
   renderCartPage();
 });
 
-/* Add to cart (GLOBAL) - funciona si tu botón tiene class .js-add-cart */
+/* Add to cart (GLOBAL)
+   ✅ Soporta:
+   - tu botón actual: [data-add-cart="ID"]
+   - compat: .js-add-cart con data-id="ID"
+*/
 document.addEventListener("click", async (e) => {
-  const btn = e.target.closest(".js-add-cart");
+  const btn =
+    e.target.closest("[data-add-cart]") ||
+    e.target.closest(".js-add-cart");
+
   if (!btn) return;
 
-  const id = btn.getAttribute("data-id");
+  const id =
+    btn.getAttribute("data-add-cart") ||
+    btn.getAttribute("data-id");
+
   if (!id) return;
 
   const nombre = btn.getAttribute("data-name");
   const precio = btn.getAttribute("data-price");
   const imagen = btn.getAttribute("data-img");
 
-  // si viene info del botón, la usamos; si no, intentamos pedirla al API
   let prod = null;
 
   if (nombre && precio) {
     prod = { id, nombre, precio: Number(precio), imagen: imagen || "" };
   } else {
     try {
-      const res = await fetch(`/api/productos/${id}`);
+      const res = await fetch(`/api/productos/${encodeURIComponent(id)}`);
       const data = await res.json().catch(() => ({}));
       const p = data.producto || data || {};
       prod = {

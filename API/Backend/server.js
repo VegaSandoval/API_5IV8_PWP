@@ -23,13 +23,21 @@ function renderWithLayout(res, view, locals = {}) {
   const pageFile = path.join(VIEWS_DIR, `${view}.ejs`);
   const layoutFile = path.join(VIEWS_DIR, "layouts", "main.ejs");
 
-  ejs.renderFile(pageFile, locals, (err, body) => {
+  // ✅ Defaults seguros para evitar errores en navbar/footer (ej. pageJs.includes)
+  const safeLocals = {
+    title: "",
+    pageCss: "",
+    pageJs: "",
+    ...locals,
+  };
+
+  ejs.renderFile(pageFile, safeLocals, (err, body) => {
     if (err) {
       console.error("EJS page error:", err);
       return res.status(500).send("Error al renderizar la vista.");
     }
 
-    ejs.renderFile(layoutFile, { ...locals, body }, (err2, html) => {
+    ejs.renderFile(layoutFile, { ...safeLocals, body }, (err2, html) => {
       if (err2) {
         console.error("EJS layout error:", err2);
         return res.status(500).send("Error al renderizar el layout.");
@@ -74,8 +82,9 @@ app.get("/products/:id", (req, res) =>
 app.get("/cart", (req, res) =>
   renderWithLayout(res, "pages/cart", {
     title: "Carrito",
-    pageCss: "/css/pages/cart.css",
-    // cart.js ya va global desde el layout
+    // ✅ ya no es obligatorio pasar cart.css aquí porque va global en main.ejs
+    // pageCss: "/css/pages/cart.css",
+    // cart.js también va global
   })
 );
 
