@@ -22,6 +22,78 @@ exports.buy = async (req, res) => {
     const userId = req.user.id; // Viene del middleware
     const { metodo_pago } = req.body;
 
+        // --- Validar que el usuario tenga ENVIO guardado ---
+    const [envioRows] = await dbp.query(
+      `SELECT nombre, telefono, calle, num_ext, colonia, ciudad, estado, cp
+       FROM usuario_envio WHERE usuario_id = ? LIMIT 1`,
+      [userId]
+    );
+
+    if (envioRows.length === 0) {
+      return res.status(400).json({
+        msg: "Debes completar tu información de envío en tu perfil antes de comprar",
+        faltantes: ["envio"]
+      });
+    }
+
+    const e = envioRows[0];
+    const faltantesEnvio = [];
+    if (!e.nombre) faltantesEnvio.push("envio_nombre");
+    if (!e.telefono) faltantesEnvio.push("envio_telefono");
+    if (!e.calle) faltantesEnvio.push("envio_calle");
+    if (!e.num_ext) faltantesEnvio.push("envio_num_ext");
+    if (!e.colonia) faltantesEnvio.push("envio_colonia");
+    if (!e.ciudad) faltantesEnvio.push("envio_ciudad");
+    if (!e.estado) faltantesEnvio.push("envio_estado");
+    if (!e.cp) faltantesEnvio.push("envio_cp");
+
+    if (faltantesEnvio.length) {
+      return res.status(400).json({
+        msg: "Te faltan campos de envío para poder comprar",
+        faltantes: faltantesEnvio
+      });
+    }
+
+    // --- Validar que el usuario tenga PAGO guardado ---
+    const [pagoRows] = await dbp.query(
+      `SELECT metodo, last4, exp_mes, exp_anio
+       FROM usuario_pago WHERE usuario_id = ? LIMIT 1`,
+      [userId]
+    );
+
+    if (pagoRows.length === 0) {
+      return res.status(400).json({
+        msg: "Debes completar tu información de pago en tu perfil antes de comprar",
+        faltantes: ["pago"]
+      });
+    }
+
+    const p = pagoRows[0];
+    if (!p.metodo) {
+      return res.status(400).json({
+        msg: "Debes elegir un método de pago en tu perfil antes de comprar",
+        faltantes: ["pago_metodo"]
+      });
+    }
+
+    // Si el método elegido en el checkout es tarjeta, asegúrate que el perfil tenga datos de tarjeta.
+    const metodoElegido = metodo_pago?.toLowerCase?.() || p.metodo;
+
+    if (metodoElegido === "tarjeta") {
+      const faltantesTarjeta = [];
+      if (!p.last4) faltantesTarjeta.push("pago_last4");
+      if (!p.exp_mes) faltantesTarjeta.push("pago_exp_mes");
+      if (!p.exp_anio) faltantesTarjeta.push("pago_exp_anio");
+
+      if (faltantesTarjeta.length) {
+        return res.status(400).json({
+          msg: "Te faltan datos de tarjeta en tu perfil para comprar con tarjeta",
+          faltantes: faltantesTarjeta
+        });
+      }
+    }
+
+
     // 1. Validar método de pago
     if (!metodo_pago || !METODOS_PAGO.includes(metodo_pago.toLowerCase())) {
       return res.status(400).json({ 

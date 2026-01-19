@@ -374,3 +374,12 @@
   .profileBtns{ flex-direction: column; }
   .shipGrid{ grid-template-columns: 1fr; }
 }
+
+.mForm select.mSelect{
+  height: 44px;
+  border: 1px solid rgba(0,0,0,.15);
+  border-radius: 10px;
+  padding: 0 12px;
+  font-family: Inter, system-ui, sans-serif;
+  background: #fff;
+}

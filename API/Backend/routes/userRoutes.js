@@ -20,4 +20,13 @@ router.delete("/eliminar-cuenta", c.deleteAccount);
 // Preferencias
 router.get("/preferencias", c.getPreferences);
 
+// Envío (perfil)
+router.get("/envio", c.getEnvio);
+router.put("/envio", c.upsertEnvio);
+
+// Pago (perfil)
+router.get("/pago", c.getPago);
+router.put("/pago", c.upsertPago);
+
+
 module.exports = router;

@@ -437,3 +437,175 @@ exports.checkEmailAvailability = async (req, res) => {
     });
   }
 };
+
+function validarCP(cp) {
+  if (!cp) return false;
+  return /^[0-9]{5}$/.test(String(cp).trim());
+}
+
+exports.getEnvio = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const [rows] = await dbp.query(
+      `SELECT nombre, telefono, calle, num_ext, num_int, colonia, ciudad, estado, cp, referencias
+       FROM usuario_envio
+       WHERE usuario_id = ?
+       LIMIT 1`,
+      [userId]
+    );
+
+    return res.json({ envio: rows[0] || null });
+  } catch (err) {
+    console.error("Error en getEnvio:", err);
+    return res.status(500).json({ msg: "Error al obtener información de envío" });
+  }
+};
+
+exports.upsertEnvio = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const {
+      nombre, telefono, calle, num_ext, num_int,
+      colonia, ciudad, estado, cp, referencias
+    } = req.body;
+
+    // Validación mínima (para que luego puedas bloquear compra)
+    const faltantes = [];
+    if (!nombre?.trim()) faltantes.push("nombre");
+    if (!telefono?.trim()) faltantes.push("telefono");
+    if (!calle?.trim()) faltantes.push("calle");
+    if (!num_ext?.trim()) faltantes.push("num_ext");
+    if (!colonia?.trim()) faltantes.push("colonia");
+    if (!ciudad?.trim()) faltantes.push("ciudad");
+    if (!estado?.trim()) faltantes.push("estado");
+    if (!validarCP(cp)) faltantes.push("cp");
+
+    if (faltantes.length) {
+      return res.status(400).json({
+        msg: "Faltan datos obligatorios de envío",
+        faltantes
+      });
+    }
+
+    await dbp.query(
+      `INSERT INTO usuario_envio
+        (usuario_id, nombre, telefono, calle, num_ext, num_int, colonia, ciudad, estado, cp, referencias)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE
+         nombre = VALUES(nombre),
+         telefono = VALUES(telefono),
+         calle = VALUES(calle),
+         num_ext = VALUES(num_ext),
+         num_int = VALUES(num_int),
+         colonia = VALUES(colonia),
+         ciudad = VALUES(ciudad),
+         estado = VALUES(estado),
+         cp = VALUES(cp),
+         referencias = VALUES(referencias)`,
+      [
+        userId,
+        nombre.trim(),
+        telefono.trim(),
+        calle.trim(),
+        num_ext.trim(),
+        num_int?.trim() || null,
+        colonia.trim(),
+        ciudad.trim(),
+        estado.trim(),
+        String(cp).trim(),
+        referencias?.trim() || null
+      ]
+    );
+
+    return res.json({ msg: "Información de envío guardada correctamente" });
+  } catch (err) {
+    console.error("Error en upsertEnvio:", err);
+    return res.status(500).json({ msg: "Error al guardar información de envío" });
+  }
+};
+
+
+const METODOS_PAGO = ['efectivo', 'tarjeta', 'transferencia', 'paypal'];
+
+function validarLast4(last4) {
+  if (!last4) return false;
+  return /^[0-9]{4}$/.test(String(last4).trim());
+}
+
+exports.getPago = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const [rows] = await dbp.query(
+      `SELECT metodo, titular, marca, last4, exp_mes, exp_anio
+       FROM usuario_pago
+       WHERE usuario_id = ?
+       LIMIT 1`,
+      [userId]
+    );
+
+    return res.json({ pago: rows[0] || null });
+  } catch (err) {
+    console.error("Error en getPago:", err);
+    return res.status(500).json({ msg: "Error al obtener información de pago" });
+  }
+};
+
+exports.upsertPago = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { metodo, titular, marca, last4, exp_mes, exp_anio } = req.body;
+
+    const metodoNorm = metodo?.toLowerCase?.().trim();
+
+    if (!metodoNorm || !METODOS_PAGO.includes(metodoNorm)) {
+      return res.status(400).json({
+        msg: "Método de pago inválido",
+        metodos_validos: METODOS_PAGO
+      });
+    }
+
+    // Si es tarjeta, exigimos last4 y expiración (mínimo realista)
+    const faltantes = [];
+    if (metodoNorm === "tarjeta") {
+      if (!validarLast4(last4)) faltantes.push("last4");
+      if (!exp_mes || !(Number(exp_mes) >= 1 && Number(exp_mes) <= 12)) faltantes.push("exp_mes");
+      if (!exp_anio || !(Number(exp_anio) >= 2020 && Number(exp_anio) <= 2099)) faltantes.push("exp_anio");
+    }
+
+    if (faltantes.length) {
+      return res.status(400).json({
+        msg: "Faltan datos obligatorios para tarjeta",
+        faltantes
+      });
+    }
+
+    await dbp.query(
+      `INSERT INTO usuario_pago
+        (usuario_id, metodo, titular, marca, last4, exp_mes, exp_anio)
+       VALUES (?, ?, ?, ?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE
+         metodo = VALUES(metodo),
+         titular = VALUES(titular),
+         marca = VALUES(marca),
+         last4 = VALUES(last4),
+         exp_mes = VALUES(exp_mes),
+         exp_anio = VALUES(exp_anio)`,
+      [
+        userId,
+        metodoNorm,
+        titular?.trim() || null,
+        marca?.trim() || null,
+        last4 ? String(last4).trim() : null,
+        exp_mes ? Number(exp_mes) : null,
+        exp_anio ? Number(exp_anio) : null
+      ]
+    );
+
+    return res.json({ msg: "Información de pago guardada correctamente" });
+  } catch (err) {
+    console.error("Error en upsertPago:", err);
+    return res.status(500).json({ msg: "Error al guardar información de pago" });
+  }
+};
