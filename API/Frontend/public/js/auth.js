@@ -40,10 +40,15 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
 
       if (data.usuario) localStorage.setItem("user", JSON.stringify(data.usuario));
 
+      // ✅ AQUÍ VA EL CAMBIO (detecta rol y redirige)
+      const rol = (data?.usuario?.rol || data?.rol || "").toString().toLowerCase();
+      const next = rol === "admin" ? "/admin" : "/products"; // o "/profile" si prefieres
+
       showMsg("Iniciando sesión...", "ok");
-      setTimeout(() => (window.location.href = "/products"), 400);
+      setTimeout(() => (window.location.href = next), 400);
       return;
     }
+
 
     showMsg("Respuesta inválida del servidor.", "err");
   } catch (err) {

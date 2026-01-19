@@ -47,6 +47,44 @@ function renderWithLayout(res, view, locals = {}) {
   });
 }
 
+// ✅ Render con layout ADMIN
+function renderWithAdminLayout(res, view, locals = {}) {
+  const pageFile = path.join(VIEWS_DIR, `${view}.ejs`);
+  const layoutFile = path.join(VIEWS_DIR, "layouts", "admin.ejs");
+
+  const safeLocals = {
+    title: "",
+    pageCss: "",
+    pageJs: "",
+    ...locals,
+  };
+
+  ejs.renderFile(pageFile, safeLocals, (err, body) => {
+    if (err) {
+      console.error("EJS admin page error:", err);
+      return res.status(500).send("Error al renderizar la vista admin.");
+    }
+
+    ejs.renderFile(layoutFile, { ...safeLocals, body }, (err2, html) => {
+      if (err2) {
+        console.error("EJS admin layout error:", err2);
+        return res.status(500).send("Error al renderizar el layout admin.");
+      }
+      return res.send(html);
+    });
+  });
+}
+
+// Admin view (layout admin)
+app.get("/admin", (req, res) =>
+  renderWithAdminLayout(res, "pages/admin", {
+    title: "Admin Panel",
+    pageCss: "/css/pages/admin.css",
+    pageJs: "/js/admin.js",
+  })
+);
+
+
 // API routes
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/user", require("./routes/userRoutes"));

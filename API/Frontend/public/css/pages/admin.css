@@ -1,0 +1,288 @@
+.adminTop{
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(255,255,255,.86);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0,0,0,.08);
+}
+
+.adminTop__inner{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  padding: 14px 0;
+  gap: 12px;
+}
+
+.adminBrand{
+  font-family: Quicksand, Inter, sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  color:#000;
+  text-decoration:none;
+  letter-spacing: .5px;
+}
+.adminBrand span{
+  font-weight: 700;
+  color:#84553C;
+  margin-left: 8px;
+}
+
+.adminNav{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.adminNav__link{
+  font-family: Poppins, Inter, sans-serif;
+  font-size: 12px;
+  color:#000;
+  text-decoration:none;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,.12);
+  background: rgba(255,255,255,.7);
+}
+
+.adminPage{ padding: 22px 0 60px; }
+
+.adminHead{
+  background: #F3D9C8;
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 18px;
+  padding: 18px 18px;
+}
+
+.adminTitle{
+  font-family: Quicksand, Inter, sans-serif;
+  font-size: 34px;
+  margin: 0;
+}
+
+.adminSub{
+  margin: 6px 0 0;
+  font-family: Inter, system-ui, sans-serif;
+  color: rgba(0,0,0,.7);
+}
+
+.adminGrid{
+  margin-top: 14px;
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.adminCard{
+  background: rgba(255,255,255,.75);
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 18px;
+  padding: 14px 14px;
+}
+
+.adminCard__kpi{
+  font-family: Poppins, Inter, sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  color:#84553C;
+}
+
+.adminCard__label{
+  margin-top: 6px;
+  font-family: Inter, system-ui, sans-serif;
+  color: rgba(0,0,0,.7);
+  font-size: 12px;
+}
+
+.adminTabs{
+  margin-top: 14px;
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Reusamos estilo pill (para que no dependas de cart.css) */
+.pillBtn{
+  height: 34px;
+  padding: 0 18px;
+  border-radius: 50px;
+  border: 1px solid #000;
+  background: #fff;
+  color:#000;
+  font-family: Poppins, Inter, sans-serif;
+  font-size: 12px;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+.pillBtn--outline{ background: transparent; }
+.pillBtn.is-active{
+  background:#000;
+  color:#fff;
+}
+
+.adminPanel{ margin-top: 14px; }
+.hide{ display:none !important; }
+
+.adminPanel__grid{
+  display:grid;
+  grid-template-columns: 380px 1fr;
+  gap: 14px;
+}
+
+.adminBox{
+  background:#fff;
+  border-radius: 18px;
+  border: 1px solid rgba(0,0,0,.08);
+  padding: 14px;
+}
+
+.adminBox__head{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.adminH2{
+  font-family: Poppins, Inter, sans-serif;
+  font-size: 18px;
+  margin: 0;
+}
+
+.adminForm{
+  display:flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.adminField span{
+  display:block;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  color: rgba(0,0,0,.75);
+  margin-bottom: 6px;
+}
+
+.adminField input,
+.adminField textarea,
+.adminMiniField input,
+.adminMiniField select{
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,.14);
+  padding: 10px 12px;
+  font-family: Inter, system-ui, sans-serif;
+  outline: none;
+}
+
+.adminRow2{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.adminActions{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+}
+
+.adminMsg{
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  color: rgba(0,0,0,.75);
+}
+
+.adminTableWrap{
+  overflow:auto;
+  border-radius: 14px;
+  border: 1px solid rgba(0,0,0,.08);
+}
+
+.adminTable{
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  min-width: 760px;
+}
+
+.adminTable th, .adminTable td{
+  text-align:left;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+}
+
+.adminTable thead th{
+  font-family: Poppins, Inter, sans-serif;
+  font-weight: 600;
+  background: rgba(0,0,0,.03);
+}
+
+.adminEmpty{
+  padding: 16px;
+  color: rgba(0,0,0,.65);
+}
+
+.adminStockControls{
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.adminStockControls input{
+  width: 90px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,.14);
+}
+
+.adminStockControls select{
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,.14);
+}
+
+.adminFilters{
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items:end;
+  margin-bottom: 12px;
+}
+
+.adminMiniField span{
+  display:block;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  color: rgba(0,0,0,.75);
+  margin-bottom: 6px;
+}
+
+.adminPager{
+  margin-top: 12px;
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.adminPager__info{
+  font-family: Inter, system-ui, sans-serif;
+  color: rgba(0,0,0,.7);
+  font-size: 12px;
+}
+
+@media (max-width: 980px){
+  .adminGrid{ grid-template-columns: 1fr 1fr; }
+  .adminPanel__grid{ grid-template-columns: 1fr; }
+  .adminTable{ min-width: 680px; }
+}

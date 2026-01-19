@@ -1,0 +1,175 @@
+<section class="admin">
+  <div class="adminHead">
+    <h1 class="adminTitle">Panel de Administración</h1>
+    <p class="adminSub">Gestiona productos, stock y consulta ventas.</p>
+  </div>
+
+  <!-- Cards Dashboard -->
+  <section class="adminGrid" id="dashCards">
+    <article class="adminCard">
+      <div class="adminCard__kpi" id="kpiVentas">$0.00</div>
+      <div class="adminCard__label">Ingresos totales</div>
+    </article>
+    <article class="adminCard">
+      <div class="adminCard__kpi" id="kpiTotalVentas">0</div>
+      <div class="adminCard__label">Ventas completadas</div>
+    </article>
+    <article class="adminCard">
+      <div class="adminCard__kpi" id="kpiProductos">0</div>
+      <div class="adminCard__label">Productos totales</div>
+    </article>
+    <article class="adminCard">
+      <div class="adminCard__kpi" id="kpiStockBajo">0</div>
+      <div class="adminCard__label">Stock bajo</div>
+    </article>
+  </section>
+
+  <div class="adminTabs">
+    <button class="pillBtn is-active" type="button" data-tab="products">Productos</button>
+    <button class="pillBtn pillBtn--outline" type="button" data-tab="sales">Ventas</button>
+  </div>
+
+  <!-- =========================
+       TAB: PRODUCTOS
+  ========================== -->
+  <section class="adminPanel" id="panelProducts">
+    <div class="adminPanel__grid">
+      <!-- Crear producto -->
+      <article class="adminBox">
+        <h2 class="adminH2">Subir producto</h2>
+
+        <form id="formCreateProduct" class="adminForm">
+          <label class="adminField">
+            <span>Nombre *</span>
+            <input name="nombre" required maxlength="150" />
+          </label>
+
+          <label class="adminField">
+            <span>Descripción</span>
+            <textarea name="descripcion" rows="3"></textarea>
+          </label>
+
+          <div class="adminRow2">
+            <label class="adminField">
+              <span>Precio *</span>
+              <input name="precio" required type="number" step="0.01" min="0" />
+            </label>
+
+            <label class="adminField">
+              <span>Stock *</span>
+              <input name="stock" required type="number" min="0" />
+            </label>
+          </div>
+
+          <div class="adminRow2">
+            <label class="adminField">
+              <span>Categoría</span>
+              <input name="categoria" maxlength="60" />
+            </label>
+
+            <label class="adminField">
+              <span>Color</span>
+              <input name="color" maxlength="60" />
+            </label>
+          </div>
+
+          <label class="adminField">
+            <span>Imagen (URL/Path)</span>
+            <input name="imagen" placeholder="/images/product-placeholder.png" />
+          </label>
+
+          <div class="adminActions">
+            <button class="pillBtn" type="submit">Crear</button>
+            <div class="adminMsg" id="createMsg"></div>
+          </div>
+        </form>
+      </article>
+
+      <!-- Listado + stock -->
+      <article class="adminBox">
+        <div class="adminBox__head">
+          <h2 class="adminH2">Productos</h2>
+          <button class="pillBtn pillBtn--outline" type="button" id="btnRefreshProducts">Actualizar</button>
+        </div>
+
+        <div class="adminTableWrap">
+          <table class="adminTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Stock (acción)</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="productsTbody">
+              <tr><td colspan="6" class="adminEmpty">Cargando productos...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- =========================
+       TAB: VENTAS
+  ========================== -->
+  <section class="adminPanel hide" id="panelSales">
+    <article class="adminBox">
+      <div class="adminBox__head">
+        <h2 class="adminH2">Historial de ventas</h2>
+        <button class="pillBtn pillBtn--outline" type="button" id="btnRefreshSales">Actualizar</button>
+      </div>
+
+      <div class="adminFilters">
+        <label class="adminMiniField">
+          <span>Estado</span>
+          <select id="saleEstado">
+            <option value="">Todos</option>
+            <option value="completada">Completada</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="cancelada">Cancelada</option>
+          </select>
+        </label>
+
+        <label class="adminMiniField">
+          <span>Desde</span>
+          <input type="date" id="saleDesde" />
+        </label>
+
+        <label class="adminMiniField">
+          <span>Hasta</span>
+          <input type="date" id="saleHasta" />
+        </label>
+
+        <button class="pillBtn" type="button" id="btnApplySalesFilters">Aplicar</button>
+      </div>
+
+      <div class="adminTableWrap">
+        <table class="adminTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Cliente</th>
+              <th>Total</th>
+              <th>Método</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody id="salesTbody">
+            <tr><td colspan="6" class="adminEmpty">Cargando ventas...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="adminPager">
+        <button class="pillBtn pillBtn--outline" type="button" id="btnPrevSales">Anterior</button>
+        <div class="adminPager__info" id="salesPageInfo">Página 1</div>
+        <button class="pillBtn pillBtn--outline" type="button" id="btnNextSales">Siguiente</button>
+      </div>
+    </article>
+  </section>
+</section>
