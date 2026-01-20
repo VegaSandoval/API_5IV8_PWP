@@ -190,7 +190,7 @@
 
 .promoCard{
   position:relative;
-  background:#BFC5AD; /* fallback */
+  background:#BFC5AD;
   height: 510px;
   border-radius: 0;
   overflow:hidden;
@@ -292,33 +292,45 @@
   cursor:pointer;
 }
 
-/* Modal */
+/* =========================
+   MODAL (fix: no se sale de pantalla)
+========================= */
 .modal{
   position: fixed;
   inset: 0;
   display:flex;
-  align-items:center;
+  align-items:flex-start;              /* <- antes center; ahora siempre visible arriba */
   justify-content:center;
+  padding: 16px;                      /* <- margen con viewport */
   background: rgba(0,0,0,.35);
   z-index: 999;
 }
+
 .modal__box{
-  width: min(720px, calc(100vw - 32px));
+  width: min(760px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);     /* <- limita alto */
   background:#fff;
   border-radius: 18px;
   overflow:hidden;
+
+  display:flex;                       /* <- head + body + foot */
+  flex-direction: column;
 }
+
 .modal__head{
   display:flex;
   align-items:center;
   justify-content: space-between;
   padding: 14px 16px;
   border-bottom: 1px solid rgba(0,0,0,.08);
+  background:#fff;
 }
+
 .modal__title{
   font-family: Inter, system-ui, sans-serif;
   font-weight: 700;
 }
+
 .modal__close{
   width: 38px;
   height: 38px;
@@ -327,31 +339,57 @@
   background: transparent;
   cursor:pointer;
 }
+
 .modal__body{
   padding: 16px;
+  overflow:auto;                      /* <- scroll interno */
+  -webkit-overflow-scrolling: touch;
 }
+
 .modal__foot{
   display:flex;
   justify-content:flex-end;
   gap: 10px;
   padding: 14px 16px;
   border-top: 1px solid rgba(0,0,0,.08);
+  background:#fff;
 }
 
+/* =========================
+   FORM (grid responsive)
+========================= */
 .mForm{
-  display:flex;
-  flex-direction: column;
-  gap: 8px;
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
 }
-.mForm h4{
-  margin: 8px 0 0;
+
+.mForm--2col{
+  grid-template-columns: 1fr 1fr;
+}
+
+.mSection{
+  grid-column: 1 / -1;
+  margin: 6px 0 -2px;
   font-family: Inter, system-ui, sans-serif;
 }
+
+.mField{
+  display:flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mField--full{
+  grid-column: 1 / -1;
+}
+
 .mForm label{
   font-family: Inter, system-ui, sans-serif;
   font-size: 13px;
-  opacity:.8;
+  opacity:.85;
 }
+
 .mForm input{
   height: 44px;
   border: 1px solid rgba(0,0,0,.15);
@@ -359,11 +397,31 @@
   padding: 0 12px;
   font-family: Inter, system-ui, sans-serif;
 }
+
+.mForm input::placeholder{
+  opacity: .55;
+}
+
 .mHint{
   font-family: Inter, system-ui, sans-serif;
   font-size: 12px;
-  opacity:.7;
+  opacity:.72;
+}
+
+.mCardFields{
+  grid-column: 1 / -1;
   margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(0,0,0,.18);
+}
+
+.mForm select.mSelect{
+  height: 44px;
+  border: 1px solid rgba(0,0,0,.15);
+  border-radius: 10px;
+  padding: 0 12px;
+  font-family: Inter, system-ui, sans-serif;
+  background: #fff;
 }
 
 /* Responsive */
@@ -375,11 +433,13 @@
   .shipGrid{ grid-template-columns: 1fr; }
 }
 
-.mForm select.mSelect{
-  height: 44px;
-  border: 1px solid rgba(0,0,0,.15);
-  border-radius: 10px;
-  padding: 0 12px;
-  font-family: Inter, system-ui, sans-serif;
-  background: #fff;
+@media (max-width: 720px){
+  .mForm--2col{ grid-template-columns: 1fr; } /* <- 2 col pasa a 1 col */
+  .modal__foot{ flex-direction: column-reverse; } /* <- botones cómodos en móvil */
+}
+
+@media (max-width: 620px){
+  .profileTitle{ font-size: 30px; }
+  .profileLabel, .payLabel, .shipLabel{ font-size: 22px; }
+  .promoText{ font-size: 44px; line-height: 85%; }
 }

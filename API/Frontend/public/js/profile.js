@@ -22,7 +22,6 @@ async function fetchJSON(url, opts = {}) {
   }
 
   if (!res.ok) {
-    // si el backend manda {msg, faltantes}, lo respetamos
     const msg = data?.msg || "Error";
     const extra = Array.isArray(data?.faltantes) ? `\nFaltantes: ${data.faltantes.join(", ")}` : "";
     throw new Error(msg + extra);
@@ -79,6 +78,10 @@ function openModal(title, html, onSave) {
   modalBody.innerHTML = html;
   modalOnSave = onSave;
   modal.classList.remove("hide");
+
+  // (UI) enfoque al primer input si existe
+  const first = modalBody.querySelector("input, select, textarea");
+  first?.focus?.();
 }
 
 function closeModal() {
@@ -107,13 +110,7 @@ function renderExtra() {
 }
 
 function renderShip() {
-  // Tu UI solo muestra 3 campos: País, Alcaldía, CP
-  // Mapeo simple a tu BD:
-  // - País: fijo "México" (no lo guardamos)
-  // - Alcaldía: usamos "ciudad"
-  // - CP: usamos "cp"
   const envio = currentEnvio;
-
   document.getElementById("sPais").textContent = "México";
   document.getElementById("sAlcaldia").textContent = envio?.ciudad || "—";
   document.getElementById("sCP").textContent = envio?.cp || "—";
@@ -173,20 +170,22 @@ function renderHistory(compras = []) {
     return;
   }
 
-  el.innerHTML = compras.slice(0, 3).map((c) => {
-    const fecha = c.fecha ? new Date(c.fecha).toLocaleDateString("es-MX") : "—";
-    const total = money(c.total);
-    const items = Array.isArray(c.items) ? c.items : [];
-    const totalProductos = items.reduce((sum, it) => sum + (Number(it.cantidad) || 0), 0);
+  el.innerHTML = compras
+    .slice(0, 3)
+    .map((c) => {
+      const fecha = c.fecha ? new Date(c.fecha).toLocaleDateString("es-MX") : "—";
+      const total = money(c.total);
+      const items = Array.isArray(c.items) ? c.items : [];
+      const totalProductos = items.reduce((sum, it) => sum + (Number(it.cantidad) || 0), 0);
 
-    const nombres = items.length
-      ? items
-          .slice(0, 2)
-          .map((it) => it.nombre || "Producto")
-          .join(", ") + (items.length > 2 ? "..." : "")
-      : `Compra #${c.id}`;
+      const nombres = items.length
+        ? items
+            .slice(0, 2)
+            .map((it) => it.nombre || "Producto")
+            .join(", ") + (items.length > 2 ? "..." : "")
+        : `Compra #${c.id}`;
 
-    return `
+      return `
       <div class="historyItem">
         <div class="historyProd">${nombres}</div>
         <div class="historyMeta">
@@ -197,7 +196,8 @@ function renderHistory(compras = []) {
         </div>
       </div>
     `;
-  }).join("");
+    })
+    .join("");
 }
 
 /* ---------------------------
@@ -246,7 +246,6 @@ async function loadHistory() {
   const token = getToken();
   if (!token) return renderHistory([]);
 
-  // Tu saleRoutes.js tiene GET "/historial"
   const data = await fetchJSON(`${API}/venta/historial?limit=10&page=1`, { headers: authHeaders() });
   renderHistory(data.compras || []);
 }
@@ -280,18 +279,55 @@ document.getElementById("btnEditProfile")?.addEventListener("click", async () =>
   openModal(
     "Editar perfil",
     `
-      <div class="mForm">
-        <label>Nombre</label>
-        <input id="m_nombre" value="${u.nombre || ""}" />
+      <div class="mForm mForm--2col">
+        <div class="mField mField--full">
+          <label>Nombre</label>
+          <input
+            id="m_nombre"
+            type="text"
+            value="${u.nombre || ""}"
+            placeholder="Ej. Juan de Dios Batiz (solo letras)"
+            autocomplete="name"
+          />
+        </div>
 
-        <label>Teléfono</label>
-        <input id="m_tel" value="${u.telefono || ""}" />
+        <div class="mField">
+          <label>Teléfono</label>
+          <input
+            id="m_tel"
+            type="tel"
+            value="${u.telefono || ""}"
+            placeholder="10 dígitos (solo números) ej. 5512345678"
+            inputmode="numeric"
+            autocomplete="tel"
+          />
+        </div>
 
-        <label>Edad</label>
-        <input id="m_edad" value="${ex.edad || ""}" />
+        <div class="mField">
+          <label>Edad</label>
+          <input
+            id="m_edad"
+            type="text"
+            value="${ex.edad || ""}"
+            placeholder="Ej. 19 (solo números)"
+            inputmode="numeric"
+          />
+        </div>
 
-        <label>Género</label>
-        <input id="m_genero" value="${ex.genero || ""}" />
+        <div class="mField mField--full">
+          <label>Género</label>
+          <input
+            id="m_genero"
+            type="text"
+            value="${ex.genero || ""}"
+            placeholder="Ej. Masculino / Femenino / Otro"
+            autocomplete="sex"
+          />
+        </div>
+
+        <div class="mHint mField--full">
+          Tip: Evita símbolos raros. Teléfono solo números (sin espacios).
+        </div>
       </div>
     `,
     async () => {
@@ -302,10 +338,8 @@ document.getElementById("btnEditProfile")?.addEventListener("click", async () =>
 
       if (!nombre) return alert("El nombre es obligatorio.");
 
-      // Extra local
       saveExtra({ edad: edad || "—", genero: genero || "—" });
 
-      // API perfil
       await fetchJSON(`${API}/user/profile`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", ...authHeaders() },
@@ -326,36 +360,122 @@ document.getElementById("btnEditShipping")?.addEventListener("click", () => {
   openModal(
     "Editar envío",
     `
-      <div class="mForm">
-        <label>Nombre (recibe)</label>
-        <input id="m_e_nombre" value="${e.nombre || ""}" />
+      <div class="mForm mForm--2col">
+        <div class="mField">
+          <label>Nombre (recibe)</label>
+          <input
+            id="m_e_nombre"
+            type="text"
+            value="${e.nombre || ""}"
+            placeholder="Ej. Juan de Dios Batiz (solo letras)"
+            autocomplete="name"
+          />
+        </div>
 
-        <label>Teléfono</label>
-        <input id="m_e_tel" value="${e.telefono || ""}" />
+        <div class="mField">
+          <label>Teléfono</label>
+          <input
+            id="m_e_tel"
+            type="tel"
+            value="${e.telefono || ""}"
+            placeholder="10 dígitos (solo números) ej. 5512345678"
+            inputmode="numeric"
+            autocomplete="tel"
+          />
+        </div>
 
-        <label>Calle</label>
-        <input id="m_e_calle" value="${e.calle || ""}" />
+        <div class="mField mField--full">
+          <label>Calle</label>
+          <input
+            id="m_e_calle"
+            type="text"
+            value="${e.calle || ""}"
+            placeholder="Ej. Av. Insurgentes Sur"
+            autocomplete="address-line1"
+          />
+        </div>
 
-        <label>Número exterior</label>
-        <input id="m_e_ext" value="${e.num_ext || ""}" />
+        <div class="mField">
+          <label>Número exterior</label>
+          <input
+            id="m_e_ext"
+            type="text"
+            value="${e.num_ext || ""}"
+            placeholder="Ej. 123"
+            inputmode="text"
+          />
+        </div>
 
-        <label>Número interior (opcional)</label>
-        <input id="m_e_int" value="${e.num_int || ""}" />
+        <div class="mField">
+          <label>Número interior (opcional)</label>
+          <input
+            id="m_e_int"
+            type="text"
+            value="${e.num_int || ""}"
+            placeholder="Ej. 4B (opcional)"
+            inputmode="text"
+          />
+        </div>
 
-        <label>Colonia</label>
-        <input id="m_e_col" value="${e.colonia || ""}" />
+        <div class="mField">
+          <label>Colonia</label>
+          <input
+            id="m_e_col"
+            type="text"
+            value="${e.colonia || ""}"
+            placeholder="Ej. Del Valle"
+            autocomplete="address-line2"
+          />
+        </div>
 
-        <label>Alcaldía / Ciudad</label>
-        <input id="m_e_ciu" value="${e.ciudad || ""}" />
+        <div class="mField">
+          <label>Alcaldía / Ciudad</label>
+          <input
+            id="m_e_ciu"
+            type="text"
+            value="${e.ciudad || ""}"
+            placeholder="Ej. Benito Juárez"
+            autocomplete="address-level2"
+          />
+        </div>
 
-        <label>Estado</label>
-        <input id="m_e_est" value="${e.estado || ""}" />
+        <div class="mField">
+          <label>Estado</label>
+          <input
+            id="m_e_est"
+            type="text"
+            value="${e.estado || ""}"
+            placeholder="Ej. CDMX / Estado de México"
+            autocomplete="address-level1"
+          />
+        </div>
 
-        <label>Código Postal</label>
-        <input id="m_e_cp" value="${e.cp || ""}" />
+        <div class="mField">
+          <label>Código Postal</label>
+          <input
+            id="m_e_cp"
+            type="text"
+            value="${e.cp || ""}"
+            placeholder="5 dígitos ej. 03100"
+            inputmode="numeric"
+            maxlength="5"
+            autocomplete="postal-code"
+          />
+        </div>
 
-        <label>Referencias (opcional)</label>
-        <input id="m_e_ref" value="${e.referencias || ""}" />
+        <div class="mField mField--full">
+          <label>Referencias (opcional)</label>
+          <input
+            id="m_e_ref"
+            type="text"
+            value="${e.referencias || ""}"
+            placeholder="Ej. Entre X y Y, puerta verde (opcional)"
+          />
+        </div>
+
+        <div class="mHint mField--full">
+          Tip: CP en México normalmente son 5 dígitos. Número interior puede ir vacío.
+        </div>
       </div>
     `,
     async () => {
@@ -392,32 +512,88 @@ document.getElementById("btnEditPayment")?.addEventListener("click", () => {
   openModal(
     "Editar método de pago",
     `
-      <div class="mForm">
-        <label>Método</label>
-        <select id="m_p_metodo" class="mSelect">
-          <option value="efectivo" ${metodo === "efectivo" ? "selected" : ""}>Efectivo</option>
-          <option value="tarjeta" ${metodo === "tarjeta" ? "selected" : ""}>Tarjeta</option>
-          <option value="transferencia" ${metodo === "transferencia" ? "selected" : ""}>Transferencia</option>
-          <option value="paypal" ${metodo === "paypal" ? "selected" : ""}>PayPal</option>
-        </select>
+      <div class="mForm mForm--2col">
+        <div class="mField mField--full">
+          <label>Método</label>
+          <select id="m_p_metodo" class="mSelect">
+            <option value="efectivo" ${metodo === "efectivo" ? "selected" : ""}>Efectivo</option>
+            <option value="tarjeta" ${metodo === "tarjeta" ? "selected" : ""}>Tarjeta</option>
+            <option value="transferencia" ${metodo === "transferencia" ? "selected" : ""}>Transferencia</option>
+            <option value="paypal" ${metodo === "paypal" ? "selected" : ""}>PayPal</option>
+          </select>
+        </div>
 
-        <label>Titular (opcional)</label>
-        <input id="m_p_titular" value="${p.titular || ""}" />
+        <div class="mField mField--full">
+          <label>Titular (opcional)</label>
+          <input
+            id="m_p_titular"
+            type="text"
+            value="${p.titular || ""}"
+            placeholder="Ej. Juan de Dios Batiz (como aparece en tu tarjeta) - opcional"
+            autocomplete="cc-name"
+          />
+        </div>
 
-        <div id="tarjetaWrap" style="margin-top:6px;">
-          <label>Marca (opcional)</label>
-          <input id="m_p_marca" value="${p.marca || ""}" />
+        <div id="tarjetaWrap" class="mCardFields">
+          <div class="mForm mForm--2col">
+            <div class="mField">
+              <label>Marca (opcional)</label>
+              <input
+                id="m_p_marca"
+                type="text"
+                value="${p.marca || ""}"
+                placeholder="Ej. Visa / Mastercard (opcional)"
+                autocomplete="cc-type"
+              />
+            </div>
 
-          <label>Últimos 4 dígitos</label>
-          <input id="m_p_last4" value="${p.last4 || ""}" maxlength="4" />
+            <div class="mField">
+              <label>Últimos 4 dígitos</label>
+              <input
+                id="m_p_last4"
+                type="text"
+                value="${p.last4 || ""}"
+                placeholder="Solo 4 números ej. 1234"
+                inputmode="numeric"
+                maxlength="4"
+                autocomplete="cc-number"
+              />
+            </div>
 
-          <label>Expira (mes)</label>
-          <input id="m_p_mes" value="${p.exp_mes || ""}" placeholder="MM" />
+            <div class="mField">
+              <label>Expira (mes)</label>
+              <input
+                id="m_p_mes"
+                type="text"
+                value="${p.exp_mes || ""}"
+                placeholder="MM (01-12)"
+                inputmode="numeric"
+                maxlength="2"
+                autocomplete="cc-exp-month"
+              />
+            </div>
 
-          <label>Expira (año)</label>
-          <input id="m_p_anio" value="${p.exp_anio || ""}" placeholder="YYYY" />
+            <div class="mField">
+              <label>Expira (año)</label>
+              <input
+                id="m_p_anio"
+                type="text"
+                value="${p.exp_anio || ""}"
+                placeholder="YYYY ej. 2028"
+                inputmode="numeric"
+                maxlength="4"
+                autocomplete="cc-exp-year"
+              />
+            </div>
 
-          <div class="mHint">*No guardes tarjeta completa ni CVV (solo práctica: last4 + expiración).</div>
+            <div class="mHint mField--full">
+              *Práctica: No guardes tarjeta completa ni CVV (solo last4 + expiración).
+            </div>
+          </div>
+        </div>
+
+        <div class="mHint mField--full">
+          Si eliges "Tarjeta" debes llenar last4 y expiración (mes/año).
         </div>
       </div>
     `,
@@ -432,7 +608,6 @@ document.getElementById("btnEditPayment")?.addEventListener("click", () => {
         exp_anio: document.getElementById("m_p_anio")?.value.trim() || null,
       };
 
-      // Limpieza simple si NO es tarjeta
       if (metodoSel !== "tarjeta") {
         payload.marca = null;
         payload.last4 = null;
@@ -451,7 +626,6 @@ document.getElementById("btnEditPayment")?.addEventListener("click", () => {
     }
   );
 
-  // comportamiento mostrar/ocultar campos de tarjeta
   toggleTarjetaFields("m_p_metodo", "tarjetaWrap");
   document.getElementById("m_p_metodo")?.addEventListener("change", () => {
     toggleTarjetaFields("m_p_metodo", "tarjetaWrap");
@@ -469,86 +643,133 @@ document.getElementById("btnEditAll")?.addEventListener("click", () => {
   openModal(
     "Editar toda la información",
     `
-      <div class="mForm">
-        <h4>Cuenta</h4>
-        <label>Nombre</label>
-        <input id="m_nombre" value="${u.nombre || ""}" />
+      <div class="mForm mForm--2col">
+        <h4 class="mSection">Cuenta</h4>
 
-        <label>Teléfono</label>
-        <input id="m_tel" value="${u.telefono || ""}" />
+        <div class="mField mField--full">
+          <label>Nombre</label>
+          <input id="m_nombre" value="${u.nombre || ""}" placeholder="Ej. Juan de Dios Batiz (solo letras)" autocomplete="name" />
+        </div>
 
-        <label>Edad</label>
-        <input id="m_edad" value="${ex.edad || ""}" />
+        <div class="mField">
+          <label>Teléfono</label>
+          <input id="m_tel" value="${u.telefono || ""}" placeholder="10 dígitos (solo números) ej. 5512345678" inputmode="numeric" autocomplete="tel" />
+        </div>
 
-        <label>Género</label>
-        <input id="m_genero" value="${ex.genero || ""}" />
+        <div class="mField">
+          <label>Edad</label>
+          <input id="m_edad" value="${ex.edad || ""}" placeholder="Ej. 19 (solo números)" inputmode="numeric" />
+        </div>
 
-        <h4>Envío</h4>
-        <label>Nombre (recibe)</label>
-        <input id="m_e_nombre" value="${e.nombre || ""}" />
+        <div class="mField mField--full">
+          <label>Género</label>
+          <input id="m_genero" value="${ex.genero || ""}" placeholder="Ej. Masculino / Femenino / Otro" />
+        </div>
 
-        <label>Teléfono</label>
-        <input id="m_e_tel" value="${e.telefono || ""}" />
+        <h4 class="mSection">Envío</h4>
 
-        <label>Calle</label>
-        <input id="m_e_calle" value="${e.calle || ""}" />
+        <div class="mField">
+          <label>Nombre (recibe)</label>
+          <input id="m_e_nombre" value="${e.nombre || ""}" placeholder="Ej. Juan de Dios Batiz" />
+        </div>
 
-        <label>Número exterior</label>
-        <input id="m_e_ext" value="${e.num_ext || ""}" />
+        <div class="mField">
+          <label>Teléfono</label>
+          <input id="m_e_tel" value="${e.telefono || ""}" placeholder="10 dígitos (solo números) ej. 5512345678" inputmode="numeric" />
+        </div>
 
-        <label>Número interior (opcional)</label>
-        <input id="m_e_int" value="${e.num_int || ""}" />
+        <div class="mField mField--full">
+          <label>Calle</label>
+          <input id="m_e_calle" value="${e.calle || ""}" placeholder="Ej. Av. Insurgentes Sur" />
+        </div>
 
-        <label>Colonia</label>
-        <input id="m_e_col" value="${e.colonia || ""}" />
+        <div class="mField">
+          <label>Número exterior</label>
+          <input id="m_e_ext" value="${e.num_ext || ""}" placeholder="Ej. 123" />
+        </div>
 
-        <label>Alcaldía / Ciudad</label>
-        <input id="m_e_ciu" value="${e.ciudad || ""}" />
+        <div class="mField">
+          <label>Número interior (opcional)</label>
+          <input id="m_e_int" value="${e.num_int || ""}" placeholder="Ej. 4B (opcional)" />
+        </div>
 
-        <label>Estado</label>
-        <input id="m_e_est" value="${e.estado || ""}" />
+        <div class="mField">
+          <label>Colonia</label>
+          <input id="m_e_col" value="${e.colonia || ""}" placeholder="Ej. Del Valle" />
+        </div>
 
-        <label>Código Postal</label>
-        <input id="m_e_cp" value="${e.cp || ""}" />
+        <div class="mField">
+          <label>Alcaldía / Ciudad</label>
+          <input id="m_e_ciu" value="${e.ciudad || ""}" placeholder="Ej. Benito Juárez" />
+        </div>
 
-        <label>Referencias (opcional)</label>
-        <input id="m_e_ref" value="${e.referencias || ""}" />
+        <div class="mField">
+          <label>Estado</label>
+          <input id="m_e_est" value="${e.estado || ""}" placeholder="Ej. CDMX / Estado de México" />
+        </div>
 
-        <h4>Pago</h4>
-        <label>Método</label>
-        <select id="m_p_metodo" class="mSelect">
-          <option value="efectivo" ${metodo === "efectivo" ? "selected" : ""}>Efectivo</option>
-          <option value="tarjeta" ${metodo === "tarjeta" ? "selected" : ""}>Tarjeta</option>
-          <option value="transferencia" ${metodo === "transferencia" ? "selected" : ""}>Transferencia</option>
-          <option value="paypal" ${metodo === "paypal" ? "selected" : ""}>PayPal</option>
-        </select>
+        <div class="mField">
+          <label>Código Postal</label>
+          <input id="m_e_cp" value="${e.cp || ""}" placeholder="5 dígitos ej. 03100" inputmode="numeric" maxlength="5" />
+        </div>
 
-        <label>Titular (opcional)</label>
-        <input id="m_p_titular" value="${p.titular || ""}" />
+        <div class="mField mField--full">
+          <label>Referencias (opcional)</label>
+          <input id="m_e_ref" value="${e.referencias || ""}" placeholder="Ej. Entre X y Y, puerta verde (opcional)" />
+        </div>
 
-        <div id="tarjetaWrap" style="margin-top:6px;">
-          <label>Marca (opcional)</label>
-          <input id="m_p_marca" value="${p.marca || ""}" />
+        <h4 class="mSection">Pago</h4>
 
-          <label>Últimos 4 dígitos</label>
-          <input id="m_p_last4" value="${p.last4 || ""}" maxlength="4" />
+        <div class="mField mField--full">
+          <label>Método</label>
+          <select id="m_p_metodo" class="mSelect">
+            <option value="efectivo" ${metodo === "efectivo" ? "selected" : ""}>Efectivo</option>
+            <option value="tarjeta" ${metodo === "tarjeta" ? "selected" : ""}>Tarjeta</option>
+            <option value="transferencia" ${metodo === "transferencia" ? "selected" : ""}>Transferencia</option>
+            <option value="paypal" ${metodo === "paypal" ? "selected" : ""}>PayPal</option>
+          </select>
+        </div>
 
-          <label>Expira (mes)</label>
-          <input id="m_p_mes" value="${p.exp_mes || ""}" placeholder="MM" />
+        <div class="mField mField--full">
+          <label>Titular (opcional)</label>
+          <input id="m_p_titular" value="${p.titular || ""}" placeholder="Ej. Juan de Dios Batiz (opcional)" />
+        </div>
 
-          <label>Expira (año)</label>
-          <input id="m_p_anio" value="${p.exp_anio || ""}" placeholder="YYYY" />
+        <div id="tarjetaWrap" class="mCardFields">
+          <div class="mForm mForm--2col">
+            <div class="mField">
+              <label>Marca (opcional)</label>
+              <input id="m_p_marca" value="${p.marca || ""}" placeholder="Ej. Visa / Mastercard (opcional)" />
+            </div>
+
+            <div class="mField">
+              <label>Últimos 4 dígitos</label>
+              <input id="m_p_last4" value="${p.last4 || ""}" placeholder="Solo 4 números ej. 1234" inputmode="numeric" maxlength="4" />
+            </div>
+
+            <div class="mField">
+              <label>Expira (mes)</label>
+              <input id="m_p_mes" value="${p.exp_mes || ""}" placeholder="MM (01-12)" inputmode="numeric" maxlength="2" />
+            </div>
+
+            <div class="mField">
+              <label>Expira (año)</label>
+              <input id="m_p_anio" value="${p.exp_anio || ""}" placeholder="YYYY ej. 2028" inputmode="numeric" maxlength="4" />
+            </div>
+          </div>
+        </div>
+
+        <div class="mHint mField--full">
+          Nota: Si el método NO es tarjeta, se ignoran marca/last4/exp.
         </div>
       </div>
     `,
     async () => {
-      // Extra local
       saveExtra({
         edad: document.getElementById("m_edad").value.trim() || "—",
         genero: document.getElementById("m_genero").value.trim() || "—",
       });
 
-      // Perfil (API)
       const nombre = document.getElementById("m_nombre").value.trim();
       const telefono = document.getElementById("m_tel").value.trim();
 
@@ -558,7 +779,6 @@ document.getElementById("btnEditAll")?.addEventListener("click", () => {
         body: JSON.stringify({ nombre, telefono }),
       });
 
-      // Envío (API)
       const envioPayload = {
         nombre: document.getElementById("m_e_nombre").value.trim(),
         telefono: document.getElementById("m_e_tel").value.trim(),
@@ -578,7 +798,6 @@ document.getElementById("btnEditAll")?.addEventListener("click", () => {
         body: JSON.stringify(envioPayload),
       });
 
-      // Pago (API)
       const metodoSel = document.getElementById("m_p_metodo").value;
       const pagoPayload = {
         metodo: metodoSel,
@@ -602,7 +821,6 @@ document.getElementById("btnEditAll")?.addEventListener("click", () => {
         body: JSON.stringify(pagoPayload),
       });
 
-      // Reload UI
       await loadProfile();
       renderExtra();
       await loadEnvio();
@@ -657,9 +875,7 @@ document.getElementById("btnHistoryMore")?.addEventListener("click", () => {
 
   try {
     await loadProfile();
-  } catch (e) {
-    // si falla, fetchJSON ya redirige en 401
-  }
+  } catch (e) {}
 
   renderExtra();
   await loadEnvio();
